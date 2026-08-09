@@ -1,0 +1,21 @@
+{
+	"name": "Cipher Mail",
+	"version": "0.1.0",
+	"description": "dummy",
+	"permission": ["storage"],
+	"manifest_version": 3,
+	"action": {
+		"default_popup": "start.html"
+	},
+	"content_scripts": [
+		{
+			"js": ["scripts/content.js"],
+			"matches": [
+        			"https://developer.chrome.com/docs/extensions/*",
+        			"https://developer.chrome.com/docs/webstore/*",
+					"https://mail.google.com/*"
+      			],
+			"run_at": "document_idle"
+		}
+	]
+}
