@@ -1,12 +1,10 @@
 const encoder = new TextEncoder();
 
-async function encrypt(text, key) {
+export async function encrypt(text, key) {
     const data = encoder.encode(text);
-
     const iv = crypto.getRandomValues(
         new Uint8Array(12)
     );
-
     const encrypted = await crypto.subtle.encrypt(
         {
             name: "AES-GCM",
@@ -16,20 +14,13 @@ async function encrypt(text, key) {
         data
     );
 
-    const bytes = new Uint8Array(encrypted);
-
-    const hex = [...bytes]
-        .map(b => b.toString(16).padStart(2, "0"))
-        .join("");
-
     return {
-        hex,
-        iv
+        ciphertext: toBase64(encrypted),
+        iv: toBase64(iv)
     };
 }
 
 export async function encryptMessage(text, publicKeyPem) {
-
     const key = await crypto.subtle.generateKey(
         {
             name: "AES-GCM",
@@ -39,16 +30,12 @@ export async function encryptMessage(text, publicKeyPem) {
         ["encrypt", "decrypt"]
     );
 
-    const cipherText = await encrypt(text, key);
+    const encryptedText = await encrypt(text, key);
     const rsaKey = await importPublicKey(publicKeyPem);
+
     const rawKey = await crypto.subtle.exportKey(
         "raw",
         key
-    );
-
-    console.log(
-        "5: AES key exported",
-        rawKey.byteLength
     );
 
     const encKey = await crypto.subtle.encrypt(
@@ -60,14 +47,14 @@ export async function encryptMessage(text, publicKeyPem) {
     );
 
     return {
-        cipherKey: encKey,
-        hex: cipherText.hex,
-        iv: cipherText.iv
+        encryptedKey: toBase64(encKey),
+        ciphertext: encryptedText.ciphertext,
+        iv: encryptedText.iv
     };
 }
 
 async function importPublicKey(pem) {
-    
+
     if (!pem.includes("-----BEGIN PUBLIC KEY-----")) {
         throw new Error(
             "Wrong public key format. Expected -----BEGIN PUBLIC KEY-----"
@@ -114,14 +101,6 @@ async function importPublicKey(pem) {
     );
 }
 
-function toBase64(data){
-    const bytes = data instanceof Uint8Array ? data : new Uint8Array(data);
-    let binary = "";
-    for (const byte of bytes){
-        binary += String.fromCharCode(byte);
-    }
-    return btoa(binary);
-}
 
 export function composeMessage(encrypted) {
     const message = {
@@ -129,9 +108,9 @@ export function composeMessage(encrypted) {
         algorithm: "AES-256-GCM",
         keyAlgorithm: "RSA-OAEP-SHA256",
 
-        encryptedKey: toBase64(encrypted.cipherKey),
-        iv: toBase64(encrypted.iv),
-        ciphertext: encrypted.hex
+        encryptedKey: encrypted.encryptedKey,
+        iv: encrypted.iv,
+        ciphertext: encrypted.ciphertext
     };
 
     return `-----BEGIN CIPHER MAIL-----
@@ -139,4 +118,129 @@ export function composeMessage(encrypted) {
 ${JSON.stringify(message)}
 
 -----END CIPHER MAIL-----`;
+}
+
+export function parseMessage(text) {
+    const begin = "-----BEGIN CIPHER MAIL-----";
+    const end = "-----END CIPHER MAIL-----";
+
+    const start = text.indexOf(begin);
+    const finish = text.indexOf(end);
+
+    if (start === -1 || finish === -1) {
+        throw new Error("Not a Cipher Mail message");
+    }
+
+    const json = text
+        .slice(start + begin.length, finish)
+        .trim();
+
+    return JSON.parse(json);
+}
+
+export async function importPrivateKey(pem) {
+    const cleanPem = pem
+        .replace("-----BEGIN PRIVATE KEY-----", "")
+        .replace("-----END PRIVATE KEY-----", "")
+        .replace(/\s+/g, "");
+
+    const binary = atob(cleanPem);
+
+    const bytes = new Uint8Array(binary.length);
+
+    for (let i = 0; i < binary.length; i++) {
+        bytes[i] = binary.charCodeAt(i);
+    }
+
+    console.log("Private key bytes:", bytes.length);
+
+    return await crypto.subtle.importKey(
+        "pkcs8",
+        bytes.buffer,
+        {
+            name: "RSA-OAEP",
+            hash: "SHA-256"
+        },
+        false,
+        ["decrypt"]
+    );
+}
+
+function fromHex(hex) {
+    const bytes = new Uint8Array(hex.length / 2);
+
+    for (let i = 0; i < bytes.length; i++) {
+        bytes[i] = parseInt(
+            hex.substring(i * 2, i * 2 + 2),
+            16
+        );
+    }
+
+    return bytes;
+}
+
+function fromBase64(base64) {
+    const binary = atob(base64);
+
+    const bytes = new Uint8Array(binary.length);
+
+    for (let i = 0; i < binary.length; i++) {
+        bytes[i] = binary.charCodeAt(i);
+    }
+
+    return bytes;
+}
+
+function toBase64(data) {
+    const bytes = data instanceof Uint8Array
+        ? data
+        : new Uint8Array(data);
+
+    let binary = "";
+
+    for (const byte of bytes) {
+        binary += String.fromCharCode(byte);
+    }
+
+    return btoa(binary);
+}
+
+export async function decryptMessage(message, privateKeyPem) {
+
+    const privateKey = await importPrivateKey(privateKeyPem);
+    const encryptedKey = fromBase64(message.encryptedKey);
+    const rawAesKey = await crypto.subtle.decrypt(
+            {
+                name: "RSA-OAEP"
+            },
+            privateKey,
+            encryptedKey
+        );
+
+    const aesKey = await crypto.subtle.importKey(
+            "raw",
+            rawAesKey,
+            {
+                name: "AES-GCM"
+            },
+            false,
+            ["decrypt"]
+        );
+
+   
+    const iv = fromBase64(message.iv);
+    const ciphertext = fromBase64(message.ciphertext);
+
+    
+    const decrypted = await crypto.subtle.decrypt(
+            {
+                name: "AES-GCM",
+                iv: iv
+            },
+            aesKey,
+            ciphertext
+        );
+
+    
+    return new TextDecoder().decode(decrypted);
 }

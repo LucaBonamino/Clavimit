@@ -1,16 +1,38 @@
 <html>
 
 <body>
-	<h1>Cipher Mail</h1>
+	<h1>Clavimit</h1>
+
+	<label for="privateKey">
+		Private Key
+	</label>
+
+	<p>
+		Paste an RSA private key in PEM/PKCS#8 format.
+	</p>
+
+	<textarea id="privateKey" rows="10" cols="60" placeholder="Paste your RSA private key here"></textarea>
+
+	<button id="dec">Decrypt Email</button>
+
+	<h3>Decrypted message</h3>
+
+	<textarea id="decryptedText" rows="10" cols="60" readonly placeholder="Decrypted email will appear here"></textarea>
+
+	<hr>
+
 	<label for="publicKey">
 		Recipient Public Key
 	</label>
 
 	<p>
-		Paste an RSA public key of the receiver in PEM/SPKI format.
+		Paste the recipient's RSA public key in PEM/SPKI format.
 	</p>
+
 	<textarea id="publicKey" rows="10" cols="60" placeholder="Paste recipient public key here"></textarea>
+
 	<button id="enc">Encrypt</button>
+
 	<script type="module" src="scripts/content.js"></script>
 </body>
 
