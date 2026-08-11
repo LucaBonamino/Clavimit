@@ -15,3 +15,6 @@ Write a new email, open Clavimit, insert the recipient's RSA public key, and cli
 Open the received encrypted email, open Clavimit, insert your RSA private key, and click *Decrypt*.
 
 The decrypted email will be shown in Clavimit window.
+
+## License
+Clavimit is licensed under the **GNU General Public License v3.0 (GPL-3.0)**.

@@ -1,13 +1,21 @@
 {
 	"name": "Clavimit",
 	"version": "0.1.0",
-	"description": "Email encrypter",
+	"description": "Encrypt and decrypt Gmail messages locally using AES-256-GCM and RSA-OAEP.",
 	"permissions": [
-    	"activeTab",
-    	"scripting"
-  	],
+		"activeTab",
+		"scripting",
+		"sidePanel"
+	],
 	"manifest_version": 3,
+	"host_permissions": [
+    	"https://mail.google.com/*"
+  	],
 	"action": {
-		"default_popup": "index.html"
+		"default_title": "Open Clavimit",
+		"default_popup": "popup.html"
+	},
+	"side_panel": {
+		"default_path": "index.html"
 	}
 }

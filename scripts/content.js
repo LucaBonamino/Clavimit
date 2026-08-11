@@ -8,6 +8,33 @@ const privateKeyInput = document.getElementById("privateKey");
 const decryptButton = document.getElementById("dec");
 const decryptedText = document.getElementById("decryptedText");
 
+const privateKeyFile = document.getElementById("privateKeyFile");
+const publicKeyFile = document.getElementById("publicKeyFile");
+
+privateKeyFile.addEventListener("change", async () => {
+    const file = privateKeyFile.files[0];
+
+    if (!file) {
+        return;
+    }
+
+    const text = await file.text();
+
+    document.getElementById("privateKey").value = text;
+});
+
+publicKeyFile.addEventListener("change", async () => {
+    const file = publicKeyFile.files[0];
+
+    if (!file) {
+        return;
+    }
+
+    const text = await file.text();
+
+    document.getElementById("publicKey").value = text;
+});
+
 
 decryptButton.addEventListener("click", async () => {
     try { 

@@ -1,39 +1,83 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 
-<body>
-	<h1>Clavimit</h1>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-	<label for="privateKey">
-		Private Key
-	</label>
+	<title>Clavimit</title>
 
-	<p>
-		Paste an RSA private key in PEM/PKCS#8 format.
-	</p>
+	<link rel="stylesheet" href="style/style.css">
+</head>
 
-	<textarea id="privateKey" rows="10" cols="60" placeholder="Paste your RSA private key here"></textarea>
+<body class="sidebar">
 
-	<button id="dec">Decrypt Email</button>
+	<main class="container">
 
-	<h3>Decrypted message</h3>
+		<header>
+			<h1>Clavimit</h1>
+			<p class="subtitle">
+				Encrypt and decrypt Gmail messages locally.
+			</p>
+		</header>
 
-	<textarea id="decryptedText" rows="10" cols="60" readonly placeholder="Decrypted email will appear here"></textarea>
 
-	<hr>
+		<!-- DECRYPT -->
 
-	<label for="publicKey">
-		Recipient Public Key
-	</label>
+		<section class="card">
+			<h2>Decrypt Email</h2>
 
-	<p>
-		Paste the recipient's RSA public key in PEM/SPKI format.
-	</p>
+			<label for="privateKey">
+				Private Key
+			</label>
 
-	<textarea id="publicKey" rows="10" cols="60" placeholder="Paste recipient public key here"></textarea>
+			<p>
+				Paste your RSA private key in PEM/PKCS#8 format,
+				or load it from a file.
+			</p>
 
-	<button id="enc">Encrypt</button>
+			<input type="file" id="privateKeyFile" accept=".pem,.key,.txt">
+			<textarea id="privateKey" rows="8" placeholder="-----BEGIN PRIVATE KEY-----"></textarea>
+			</br>
+			<button id="dec">
+				Decrypt Email
+			</button>
+
+			<label for="decryptedText" class="output-label">
+				Decrypted Message
+			</label>
+
+			<textarea id="decryptedText" rows="8" readonly
+				placeholder="The decrypted message will appear here."></textarea>
+		</section>
+
+
+		<!-- ENCRYPT -->
+
+		<section class="card">
+			<h2>Encrypt Email</h2>
+
+			<label for="publicKey">
+				Recipient Public Key
+			</label>
+
+			<p>
+				Paste your RSA private key in PEM/PKCS#8 format,
+				or load it from a file.
+			</p>
+
+			<input type="file" id="publicKeyFile" accept=".pem,.key,.txt">
+			<textarea id="publicKey" rows="8" placeholder="-----BEGIN PUBLIC KEY-----"></textarea>
+			</br>
+			<button id="enc">
+				Encrypt Email
+			</button>
+		</section>
+
+	</main>
 
 	<script type="module" src="scripts/content.js"></script>
+
 </body>
 
 </html>
