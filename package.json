@@ -1,19 +1,17 @@
 {
-  "name": "ciphermail",
+  "name": "clavimit",
   "version": "0.1.0",
   "description": "",
-  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/LucaBonamino/CipherMail.git"
+    "url": "git+https://github.com/LucaBonamino/Clavimit.git"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "LucaBonamino",
   "bugs": {
-    "url": "https://github.com/LucaBonamino/CipherMail/issues"
+    "url": "https://github.com/LucaBonamino/Clavimit/issues"
   },
-  "homepage": "https://github.com/LucaBonamino/CipherMail#readme"
+  "homepage": "https://github.com/LucaBonamino/Clavimit#readme"
 }
