@@ -102,41 +102,25 @@ async function importPublicKey(pem) {
 }
 
 
-export function composeMessage(encrypted) {
-    const message = {
-        version: 1,
-        algorithm: "AES-256-GCM",
-        keyAlgorithm: "RSA-OAEP-SHA256",
+// export function composeMessage(encrypted) {
+//     const message = {
+//         version: 1,
+//         algorithm: "AES-256-GCM",
+//         keyAlgorithm: "RSA-OAEP-SHA256",
 
-        encryptedKey: encrypted.encryptedKey,
-        iv: encrypted.iv,
-        ciphertext: encrypted.ciphertext
-    };
+//         encryptedKey: encrypted.encryptedKey,
+//         iv: encrypted.iv,
+//         ciphertext: encrypted.ciphertext
+//     };
 
-    return `-----BEGIN CIPHER MAIL-----
+//     return `-----BEGIN CIPHER MAIL-----
 
-${JSON.stringify(message)}
+// ${JSON.stringify(message)}
 
------END CIPHER MAIL-----`;
-}
+// -----END CIPHER MAIL-----`;
+// }
 
-export function parseMessage(text) {
-    const begin = "-----BEGIN CIPHER MAIL-----";
-    const end = "-----END CIPHER MAIL-----";
 
-    const start = text.indexOf(begin);
-    const finish = text.indexOf(end);
-
-    if (start === -1 || finish === -1) {
-        throw new Error("Not a Cipher Mail message");
-    }
-
-    const json = text
-        .slice(start + begin.length, finish)
-        .trim();
-
-    return JSON.parse(json);
-}
 
 export async function importPrivateKey(pem) {
     const cleanPem = pem

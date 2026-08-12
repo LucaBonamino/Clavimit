@@ -8,6 +8,7 @@
 	<title>Clavimit</title>
 
 	<link rel="stylesheet" href="style/style.css">
+	<link rel="stylesheet" href="style/side_bar.css">
 </head>
 
 <body class="sidebar">
@@ -24,59 +25,74 @@
 
 		<!-- DECRYPT -->
 
-		<section class="card">
-			<h2>Decrypt Email</h2>
+		<details class="card" id="decryptCard">
+			<summary class="card-header">
+				<h2>Decrypt Email</h2>
+			</summary>
 
-			<label for="privateKey">
-				Private Key
-			</label>
+			<div class="card-content">
 
-			<p>
-				Paste your RSA private key in PEM/PKCS#8 format,
-				or load it from a file.
-			</p>
+				<label for="privateKey">
+					Private Key
+				</label>
 
-			<input type="file" id="privateKeyFile" accept=".pem,.key,.txt">
-			<textarea id="privateKey" rows="8" placeholder="-----BEGIN PRIVATE KEY-----"></textarea>
-			</br>
-			<button id="dec">
-				Decrypt Email
-			</button>
+				<p>
+					Paste your RSA private key in PEM/PKCS#8 format,
+					or load it from a file.
+				</p>
 
-			<label for="decryptedText" class="output-label">
-				Decrypted Message
-			</label>
+				<input type="file" id="privateKeyFile" accept=".pem,.key,.txt">
 
-			<textarea id="decryptedText" rows="8" readonly
-				placeholder="The decrypted message will appear here."></textarea>
-		</section>
+				<textarea id="privateKey" rows="8" placeholder="-----BEGIN PRIVATE KEY-----"></textarea>
+
+				<button id="dec">
+					Decrypt Email
+				</button>
+
+				<label for="decryptedText" class="output-label">
+					Decrypted Message
+				</label>
+
+				<textarea id="decryptedText" rows="8" readonly
+					placeholder="The decrypted message will appear here."></textarea>
+
+			</div>
+		</details>
 
 
 		<!-- ENCRYPT -->
 
-		<section class="card">
-			<h2>Encrypt Email</h2>
+		<details class="card" id="encryptCard">
+			<summary class="card-header">
+				<h2>Encrypt Email</h2>
+			</summary>
 
-			<label for="publicKey">
-				Recipient Public Key
-			</label>
+			<div class="card-content">
 
-			<p>
-				Paste the recipient's RSA public key in PEM/SPKI format
-				or load it from a file.
-			</p>
+				<label for="publicKey">
+					Recipient Public Key
+				</label>
 
-			<input type="file" id="publicKeyFile" accept=".pem,.key,.txt">
-			<textarea id="publicKey" rows="8" placeholder="-----BEGIN PUBLIC KEY-----"></textarea>
-			</br>
-			<button id="enc">
-				Encrypt Email
-			</button>
-		</section>
+				<p>
+					Paste the recipient's RSA public key in PEM/SPKI format
+					or load it from a file.
+				</p>
+
+				<input type="file" id="publicKeyFile" accept=".pem,.key,.txt">
+
+				<textarea id="publicKey" rows="8" placeholder="-----BEGIN PUBLIC KEY-----"></textarea>
+
+				<button id="enc">
+					Encrypt Email
+				</button>
+
+			</div>
+		</details>
 
 	</main>
 
 	<script type="module" src="scripts/content.js"></script>
+	<script type="module" src="scripts/sidebar.js"></script>
 
 </body>
 

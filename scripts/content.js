@@ -1,5 +1,7 @@
-import { encryptMessage , composeMessage, parseMessage, decryptMessage} from "./cryptography.js";
-import {getReceivedEmailText, setEmailText, getInputEmailText} from "./emailParser.js"
+import { encryptMessage, decryptMessage } from "./cryptography.js";
+import { getReceivedEmailText, setEmailText, getInputEmailText } from "./emailParser.js"
+import { parseMessage, composeMessage } from "./messageFormat.js";
+
 
 const button = document.getElementById("enc");
 const publicKeyInput = document.getElementById("publicKey");
@@ -37,9 +39,13 @@ publicKeyFile.addEventListener("change", async () => {
 
 
 decryptButton.addEventListener("click", async () => {
-    try { 
+    try {
+        const privateKey = privateKeyInput.value.trim();
+
+        if (!privateKey) {
+            throw new Error("Please enter your private key.");
+        }
         const text = await getReceivedEmailText();
-        const privateKey = privateKeyInput.value;
         const message = parseMessage(text);
         const plaintext = await decryptMessage(
             message,
@@ -69,5 +75,3 @@ button.addEventListener("click", async () => {
         console.error("ERROR:", error);
     }
 });
-
-

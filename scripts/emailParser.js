@@ -1,3 +1,5 @@
+import { MESSAGE_BEGIN } from "./config.js";
+
 export async function getInputEmailText() {
     const [tab] = await chrome.tabs.query({
         active: true,
@@ -60,12 +62,14 @@ export async function getReceivedEmailText() {
 
     const results = await chrome.scripting.executeScript({
         target: { tabId: tab.id },
+        args: [MESSAGE_BEGIN],
 
-        func: () => {
+        func: (messageBegin) => {
             const messages = [...document.querySelectorAll(".a3s")];
+
             const visibleMessage = messages.find(message => {
                 const rect = message.getBoundingClientRect();
-                return rect.width > 0 && rect.height > 0 && message.innerText.includes("-----BEGIN CIPHER MAIL-----");
+                return rect.width > 0 && rect.height > 0 && message.innerText.includes(messageBegin);
             })
 
             if (!visibleMessage){
@@ -77,4 +81,58 @@ export async function getReceivedEmailText() {
     });
 
     return results[0]?.result;
+}
+
+
+export async function isComposeOpen() {
+    const [tab] = await chrome.tabs.query({
+        active: true,
+        currentWindow: true
+    });
+
+    const results = await chrome.scripting.executeScript({
+        target: { tabId: tab.id },
+
+        func: () => {
+            const editors = [
+                ...document.querySelectorAll(
+                    '[g_editable="true"][contenteditable="true"][role="textbox"]'
+                )
+            ];
+
+            return editors.some(editor => {
+                const rect = editor.getBoundingClientRect();
+
+                return rect.width > 0 && rect.height > 0;
+            });
+        }
+    });
+
+    return results[0]?.result ?? false;
+}
+
+
+export async function isMessageOpen() {
+    const [tab] = await chrome.tabs.query({
+        active: true,
+        currentWindow: true
+    });
+
+    const results = await chrome.scripting.executeScript({
+        target: { tabId: tab.id },
+
+        func: () => {
+            const messages = [
+                ...document.querySelectorAll(".a3s")
+            ];
+
+            return messages.some(message => {
+                const rect = message.getBoundingClientRect();
+
+                return rect.width > 0 && rect.height > 0;
+            });
+        }
+    });
+
+    return results[0]?.result ?? false;
 }
