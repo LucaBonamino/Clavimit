@@ -42,7 +42,7 @@
 				</p>
 
 				<input type="file" id="privateKeyFile" accept=".pem,.key,.txt">
-
+				<p id="decryptError" class="error-message" role="alert" hidden></p>
 				<textarea id="privateKey" rows="8" placeholder="-----BEGIN PRIVATE KEY-----"></textarea>
 
 				<button id="dec">
@@ -79,7 +79,7 @@
 				</p>
 
 				<input type="file" id="publicKeyFile" accept=".pem,.key,.txt">
-
+				<p id="encryptError" class="error-message" hidden></p>
 				<textarea id="publicKey" rows="8" placeholder="-----BEGIN PUBLIC KEY-----"></textarea>
 
 				<button id="enc">

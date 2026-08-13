@@ -1,86 +1,195 @@
 import { MESSAGE_BEGIN } from "./config.js";
+import { ClavimitError } from "./exeptions.js";
 
 export async function getInputEmailText() {
-    const [tab] = await chrome.tabs.query({
-        active: true,
-        currentWindow: true
-    });
-
-    const results = await chrome.scripting.executeScript({
-        target: { tabId: tab.id },
-
-        func: () => {
-            const editors = document.querySelectorAll(
-                '[g_editable="true"][contenteditable="true"][role="textbox"]'
+    try {
+        const [tab] = await chrome.tabs.query({
+            active: true,
+            currentWindow: true
+        });
+        if (!tab?.id) {
+            throw new ClavimitError(
+                "GMAIL_INTEGRATION_ERROR",
+                "Clavimit could not access the current Gmail tab."
             );
-
-            const editor = [...editors].find(el => {
-                const rect = el.getBoundingClientRect();
-
-                return rect.width > 0 && rect.height > 0;
-            });
-
-            if (!editor) {
-                console.log("No Gmail editor found");
-                return null;
-            }
-
-            return editor.innerText;
         }
-    });
 
-    return results[0]?.result;
+        const results = await chrome.scripting.executeScript({
+            target: { tabId: tab.id },
+
+            func: () => {
+                const editors = document.querySelectorAll(
+                    '[g_editable="true"][contenteditable="true"][role="textbox"]'
+                );
+
+                const editor = [...editors].find(el => {
+                    const rect = el.getBoundingClientRect();
+
+                    return rect.width > 0 && rect.height > 0;
+                });
+
+                if (!editor) {
+                    console.log("No Gmail editor found");
+                    return null;
+                }
+
+                return editor.innerText;
+            }
+        });
+
+        return results[0]?.result ?? null;
+    } catch (error) {
+        if (error instanceof ClavimitError) {
+            throw error;
+        }
+
+        console.error("Gmail integration error:", error);
+
+        throw new ClavimitError(
+            "GMAIL_INTEGRATION_ERROR",
+            "Clavimit could not read the Gmail compose window."
+        );
+    }
 }
 
 export async function setEmailText(text) {
-  const [tab] = await chrome.tabs.query({
-    active: true,
-    currentWindow: true
-  });
-  await chrome.scripting.executeScript({
-    target: {tabId: tab.id},
-    args: [text],
-    func: (text) => {
-      const editor = [...document.querySelectorAll(
-        '[g_editable="true"][contenteditable="true"][role="textbox"]'
-      )].find(el => {
-        const rect = el.getBoundingClientRect();
-        return rect.width > 0 && rect.height > 0;
-      });
-      if (editor){
-        editor.innerText = text;
-      }
+    try {
+        const [tab] = await chrome.tabs.query({
+            active: true,
+            currentWindow: true
+        });
+
+        if (!tab?.id) {
+            throw new ClavimitError(
+                "GMAIL_INTEGRATION_ERROR",
+                "Clavimit could not access the current Gmail tab."
+            );
+        }
+
+        const results = await chrome.scripting.executeScript({
+            target: { tabId: tab.id },
+            args: [text],
+
+            func: (text) => {
+                const editor = [...document.querySelectorAll(
+                    '[g_editable="true"][contenteditable="true"][role="textbox"]'
+                )].find(el => {
+                    const rect = el.getBoundingClientRect();
+
+                    return rect.width > 0 && rect.height > 0;
+                });
+
+                if (!editor) {
+                    return {
+                        success: false,
+                        reason: "EDITOR_NOT_FOUND"
+                    };
+                }
+
+                editor.innerText = text;
+
+                return {
+                    success: true
+                };
+            }
+        });
+
+        const result = results[0]?.result;
+
+        if (!result?.success) {
+            throw new ClavimitError(
+                "GMAIL_INTEGRATION_ERROR",
+                "Clavimit could not update the Gmail compose window."
+            );
+        }
+
+    } catch (error) {
+        if (error instanceof ClavimitError) {
+            throw error;
+        }
+
+        console.error("Failed to update Gmail editor:", error);
+
+        throw new ClavimitError(
+            "GMAIL_INTEGRATION_ERROR",
+            "Clavimit could not update the Gmail compose window."
+        );
     }
-  })
 }
 
 export async function getReceivedEmailText() {
-    const [tab] = await chrome.tabs.query({
-        active: true,
-        currentWindow: true
-    });
+    try {
+        const [tab] = await chrome.tabs.query({
+            active: true,
+            currentWindow: true
+        });
 
-    const results = await chrome.scripting.executeScript({
-        target: { tabId: tab.id },
-        args: [MESSAGE_BEGIN],
-
-        func: (messageBegin) => {
-            const messages = [...document.querySelectorAll(".a3s")];
-
-            const visibleMessage = messages.find(message => {
-                const rect = message.getBoundingClientRect();
-                return rect.width > 0 && rect.height > 0 && message.innerText.includes(messageBegin);
-            })
-
-            if (!visibleMessage){
-                return null;
-            }
-
-            return visibleMessage.innerText; 
+        if (!tab?.id) {
+            throw new ClavimitError(
+                "GMAIL_INTEGRATION_ERROR",
+                "Could not access the current Gmail tab."
+            )
         }
-    });
 
-    return results[0]?.result;
+        const results = await chrome.scripting.executeScript({
+            target: { tabId: tab.id },
+            args: [MESSAGE_BEGIN],
+
+            func: (messageBegin) => {
+                const messages = [...document.querySelectorAll(".a3s")];
+                if (messages.length === 0) {
+                    return { status: "gmail_structire_not_found" };
+                }
+                const visibleMessage = messages.find(message => {
+                    const rect = message.getBoundingClientRect();
+                    return rect.width > 0 && rect.height > 0 && message.innerText.includes(messageBegin);
+                })
+
+                if (!visibleMessage) {
+                    return { status: "message not found" };
+                }
+
+                return {
+                    status: "success",
+                    text: visibleMessage.innerText
+                };
+            }
+        });
+
+        const result = results[0]?.result;
+
+        if (!result) {
+            throw new ClavimitError(
+                "GMAIL_INTEGRATION_ERROR",
+                "Could not read the Gmail page."
+            );
+        }
+
+        if (result.status === "gmail_structure_not_found") {
+            throw new ClavimitError(
+                "GMAIL_INTEGRATION_ERROR",
+                "Clavimit could not read the Gmail page."
+            );
+        }
+
+        if (result.status === "message_not_found") {
+            return null;
+        }
+
+        return result.text;
+    } catch (error) {
+        if (error instanceof ClavimitError) {
+            throw error;
+        }
+
+        console.error("Gmail integration error:", error);
+
+        throw new ClavimitError(
+            "GMAIL_INTEGRATION_ERROR",
+            "Clavimit could not access Gmail."
+        );
+
+    }
 }
 
 

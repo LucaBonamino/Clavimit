@@ -5,6 +5,7 @@ import {
     ALGORITHM,
     KEY_ALGORITHM
 } from "./config.js";
+import { ClavimitError } from "./exeptions.js";
 
 export function createMessageBody(encrypted) {
     return {
@@ -35,10 +36,22 @@ export function serializeMessage(message) {
 
 
 export function deserializeMessage(text) {
-    const message = JSON.parse(text);
+    let message;
+
+    try {
+        message = JSON.parse(text);
+    } catch (error) {
+        throw new ClavimitError(
+            "INVALID_MESSAGE",
+            "The Clavimit message contains invalid JSON."
+        );
+    }
 
     if (!validateMessage(message)) {
-        throw new Error("Invalid Clavimit message");
+        throw new ClavimitError(
+            "INVALID_MESSAGE",
+            "The Clavimit message does not satisfy the expected format."
+        );
     }
 
     return message;
@@ -61,11 +74,14 @@ export function composeMessage(encrypted) {
 }
 
 export function parseMessage(text) {
+    if (!text) {
+        throw new ClavimitError("INVALID_MESSAGE", "No Clavimit message was found");
+    }
     const start = text.indexOf(MESSAGE_BEGIN);
     const finish = text.indexOf(MESSAGE_END);
 
     if (start === -1 || finish === -1) {
-        throw new Error("Not a Clavimit message");
+        throw new ClavimitError(INVALID_MESSAGE, "Not a Clavimit message");
     }
 
     const json = text

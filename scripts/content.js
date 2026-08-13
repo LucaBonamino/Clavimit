@@ -1,7 +1,32 @@
 import { encryptMessage, decryptMessage } from "./cryptography.js";
 import { getReceivedEmailText, setEmailText, getInputEmailText } from "./emailParser.js"
 import { parseMessage, composeMessage } from "./messageFormat.js";
+import { ClavimitError } from "./exeptions.js";
 
+
+const decryptError = document.getElementById("decryptError");
+
+function showDecryptError(message) {
+    decryptError.textContent = message;
+    decryptError.hidden = false;
+}
+
+function clearDecryptError() {
+    decryptError.textContent = "";
+    decryptError.hidden = true;
+}
+
+const encryptError = document.getElementById("encryptError");
+
+function showEncryptError(message) {
+    encryptError.textContent = message;
+    encryptError.hidden = false;
+}
+
+function clearEncryptError() {
+    encryptError.textContent = "";
+    encryptError.hidden = true;
+}
 
 const button = document.getElementById("enc");
 const publicKeyInput = document.getElementById("publicKey");
@@ -39,30 +64,48 @@ publicKeyFile.addEventListener("change", async () => {
 
 
 decryptButton.addEventListener("click", async () => {
+    clearDecryptError();
     try {
         const privateKey = privateKeyInput.value.trim();
 
         if (!privateKey) {
-            throw new Error("Please enter your private key.");
+            throw new ClavimitError("EMPTY_PRIVATE_KEY", "Please enter your private key.");
         }
         const text = await getReceivedEmailText();
         const message = parseMessage(text);
-        const plaintext = await decryptMessage(
-            message,
-            privateKey
-        );
-
-        console.log("Decrypted:", plaintext);
+        const plaintext = await decryptMessage(message, privateKey);
         decryptedText.value = plaintext;
     } catch (error) {
-        console.log("Error:", error);
+        console.error("Decryption error:", error);
+
+        if (error instanceof ClavimitError) {
+            showDecryptError(error.message);
+        } else {
+            showDecryptError(
+                "Something went wrong while decrypting the message."
+            );
+        }
     }
+
 });
 
 button.addEventListener("click", async () => {
+    clearEncryptError();
     try {
-        const publicKey = publicKeyInput.value;
+        const publicKey = publicKeyInput.value.trim();
         const text = await getInputEmailText();
+        if (!publicKey) {
+            throw new ClavimitError(
+                "EMPTY_PUBLIC_KEY",
+                "Please enter the recipient's public key."
+            )
+        }
+        if (!text?.trim()) {
+            throw new ClavimitError(
+                "EMPTY_MESSAGE",
+                "No message to encrypt provided."
+            )
+        }
         const enc = await encryptMessage(
             text,
             publicKey
@@ -72,6 +115,14 @@ button.addEventListener("click", async () => {
         await setEmailText(message);
 
     } catch (error) {
-        console.error("ERROR:", error);
+        console.error("Encryption error:", error);
+
+        if (error instanceof ClavimitError) {
+            showEncryptError(error.message);
+        } else {
+            showEncryptError(
+                "Something unexpected went wrong."
+            );
+        }
     }
 });

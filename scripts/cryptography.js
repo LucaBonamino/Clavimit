@@ -1,3 +1,5 @@
+import { ClavimitError } from "./exeptions.js";
+
 const encoder = new TextEncoder();
 
 export async function encrypt(text, key) {
@@ -54,51 +56,61 @@ export async function encryptMessage(text, publicKeyPem) {
 }
 
 async function importPublicKey(pem) {
+    try {
+        if (!pem.includes("-----BEGIN PUBLIC KEY-----") ||
+            !pem.includes("-----END PUBLIC KEY-----")) {
+            throw new ClavimitError(
+                "INVALID_PUBLIC_KEY",
+                "The public key could not be read. Expected -----BEGIN PUBLIC KEY-----"
+            );
+        }
 
-    if (!pem.includes("-----BEGIN PUBLIC KEY-----")) {
-        throw new Error(
-            "Wrong public key format. Expected -----BEGIN PUBLIC KEY-----"
+        const cleanPem = pem
+            .replace("-----BEGIN PUBLIC KEY-----", "")
+            .replace("-----END PUBLIC KEY-----", "")
+            .replace(/\s+/g, "");
+
+        const invalid = cleanPem.match(/[^A-Za-z0-9+/=]/g);
+
+        if (invalid) {
+            console.log("Invalid characters:", invalid);
+
+            throw new Error(
+                "Public key contains invalid Base64 characters"
+            );
+        }
+
+        if (cleanPem.length % 4 !== 0) {
+            throw new Error(
+                `Invalid Base64 length: ${cleanPem.length}`
+            );
+        }
+
+        const binary = atob(cleanPem);
+
+        const bytes = Uint8Array.from(
+            binary,
+            char => char.charCodeAt(0)
+        );
+
+        return await crypto.subtle.importKey(
+            "spki",
+            bytes.buffer,
+            {
+                name: "RSA-OAEP",
+                hash: "SHA-256"
+            },
+            false,
+            ["encrypt"]
+        );
+    } catch (error) {
+        console.error("Public key import failed:", error);
+
+        throw new ClavimitError(
+            "INVALID_PUBLIC_KEY",
+            "The public key could not be read."
         );
     }
-
-    const cleanPem = pem
-        .replace("-----BEGIN PUBLIC KEY-----", "")
-        .replace("-----END PUBLIC KEY-----", "")
-        .replace(/\s+/g, "");
-
-    const invalid = cleanPem.match(/[^A-Za-z0-9+/=]/g);
-
-    if (invalid) {
-        console.log("Invalid characters:", invalid);
-
-        throw new Error(
-            "Public key contains invalid Base64 characters"
-        );
-    }
-
-    if (cleanPem.length % 4 !== 0) {
-        throw new Error(
-            `Invalid Base64 length: ${cleanPem.length}`
-        );
-    }
-
-    const binary = atob(cleanPem);
-
-    const bytes = Uint8Array.from(
-        binary,
-        char => char.charCodeAt(0)
-    );
-
-    return await crypto.subtle.importKey(
-        "spki",
-        bytes.buffer,
-        {
-            name: "RSA-OAEP",
-            hash: "SHA-256"
-        },
-        false,
-        ["encrypt"]
-    );
 }
 
 
@@ -123,31 +135,31 @@ async function importPublicKey(pem) {
 
 
 export async function importPrivateKey(pem) {
-    const cleanPem = pem
-        .replace("-----BEGIN PRIVATE KEY-----", "")
-        .replace("-----END PRIVATE KEY-----", "")
-        .replace(/\s+/g, "");
+    try {
+        const cleanPem = pem
+            .replace("-----BEGIN PRIVATE KEY-----", "")
+            .replace("-----END PRIVATE KEY-----", "")
+            .replace(/\s+/g, "");
 
-    const binary = atob(cleanPem);
+        const binary = atob(cleanPem);
+        const bytes = new Uint8Array(binary.length);
+        for (let i = 0; i < binary.length; i++) {
+            bytes[i] = binary.charCodeAt(i);
+        }
 
-    const bytes = new Uint8Array(binary.length);
-
-    for (let i = 0; i < binary.length; i++) {
-        bytes[i] = binary.charCodeAt(i);
+        return await crypto.subtle.importKey(
+            "pkcs8",
+            bytes.buffer,
+            {
+                name: "RSA-OAEP",
+                hash: "SHA-256"
+            },
+            false,
+            ["decrypt"]
+        );
+    } catch (error) {
+        throw new ClavimitError("INVALID_PRIVATE_KEY", "The private key could not be read.")
     }
-
-    console.log("Private key bytes:", bytes.length);
-
-    return await crypto.subtle.importKey(
-        "pkcs8",
-        bytes.buffer,
-        {
-            name: "RSA-OAEP",
-            hash: "SHA-256"
-        },
-        false,
-        ["decrypt"]
-    );
 }
 
 function fromHex(hex) {
@@ -190,33 +202,43 @@ function toBase64(data) {
 }
 
 export async function decryptMessage(message, privateKeyPem) {
-
     const privateKey = await importPrivateKey(privateKeyPem);
     const encryptedKey = fromBase64(message.encryptedKey);
-    const rawAesKey = await crypto.subtle.decrypt(
+
+    let rawAesKey;
+
+    try {
+        rawAesKey = await crypto.subtle.decrypt(
             {
                 name: "RSA-OAEP"
             },
             privateKey,
             encryptedKey
         );
+    } catch (error) {
+        throw new ClavimitError(
+            "DECRYPTION_FAILED",
+            "The encryption key could not be decrypted with this private key."
+        );
+    }
 
     const aesKey = await crypto.subtle.importKey(
-            "raw",
-            rawAesKey,
-            {
-                name: "AES-GCM"
-            },
-            false,
-            ["decrypt"]
-        );
+        "raw",
+        rawAesKey,
+        {
+            name: "AES-GCM"
+        },
+        false,
+        ["decrypt"]
+    );
 
-   
     const iv = fromBase64(message.iv);
     const ciphertext = fromBase64(message.ciphertext);
 
-    
-    const decrypted = await crypto.subtle.decrypt(
+    let decrypted;
+
+    try {
+        decrypted = await crypto.subtle.decrypt(
             {
                 name: "AES-GCM",
                 iv: iv
@@ -224,7 +246,12 @@ export async function decryptMessage(message, privateKeyPem) {
             aesKey,
             ciphertext
         );
+    } catch (error) {
+        throw new ClavimitError(
+            "DECRYPTION_FAILED",
+            "The message could not be decrypted."
+        );
+    }
 
-    
     return new TextDecoder().decode(decrypted);
 }
