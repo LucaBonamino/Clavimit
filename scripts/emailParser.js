@@ -138,7 +138,7 @@ export async function getReceivedEmailText() {
             func: (messageBegin) => {
                 const messages = [...document.querySelectorAll(".a3s")];
                 if (messages.length === 0) {
-                    return { status: "gmail_structire_not_found" };
+                    return { status: "gmail_structure_not_found" };
                 }
                 const visibleMessage = messages.find(message => {
                     const rect = message.getBoundingClientRect();
@@ -146,7 +146,7 @@ export async function getReceivedEmailText() {
                 })
 
                 if (!visibleMessage) {
-                    return { status: "message not found" };
+                    return { status: "message_not_found" };
                 }
 
                 return {

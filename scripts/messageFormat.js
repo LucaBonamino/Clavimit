@@ -81,7 +81,7 @@ export function parseMessage(text) {
     const finish = text.indexOf(MESSAGE_END);
 
     if (start === -1 || finish === -1) {
-        throw new ClavimitError(INVALID_MESSAGE, "Not a Clavimit message");
+        throw new ClavimitError("INVALID_MESSAGE", "Not a Clavimit message");
     }
 
     const json = text

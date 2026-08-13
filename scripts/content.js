@@ -75,6 +75,7 @@ decryptButton.addEventListener("click", async () => {
         const message = parseMessage(text);
         const plaintext = await decryptMessage(message, privateKey);
         decryptedText.value = plaintext;
+        privateKeyInput.value = "";
     } catch (error) {
         console.error("Decryption error:", error);
 
@@ -113,6 +114,7 @@ button.addEventListener("click", async () => {
         const message = composeMessage(enc);
 
         await setEmailText(message);
+        publicKeyInput.value = "";
 
     } catch (error) {
         console.error("Encryption error:", error);
