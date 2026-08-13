@@ -98,6 +98,8 @@ Clavimit does not require a backend service for message encryption or decryption
 
 The email content and cryptographic keys are processed by the extension only when required to perform the requested operation.
 
+For more details, see [Privacy Policy](PRIVACY.md).
+
 ### Gmail draft limitation
 
 Clavimit currently encrypts the message after it has been written in Gmail's compose window.
