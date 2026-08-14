@@ -193,6 +193,12 @@ Longer-term features that may be explored include:
 
 Clavimit will continue to leave key ownership, distribution, and identity verification to the user rather than acting as a key-management or identity service.
 
+## Contributing
+
+Contributions are welcome.
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup, contribution guidelines, issue reporting, and current areas for contribution.
+
 ## License
 
 Clavimit is licensed under the **GNU General Public License v3.0**.
