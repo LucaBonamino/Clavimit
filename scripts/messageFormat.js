@@ -59,6 +59,9 @@ export function deserializeMessage(text) {
 
 
 export function validateMessage(message) {
+    if (!message){
+        return false;
+    }
     return (
         message.version === PAYLOAD_VERSION &&
         message.algorithm === ALGORITHM &&

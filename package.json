@@ -4,7 +4,7 @@
   "description": "Encrypt and decrypt Gmail messages locally using AES-256-GCM and RSA-OAEP.",
   "license": "GPL-3.0-only",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "vitest run"
   },
   "repository": {
     "type": "git",
@@ -14,5 +14,10 @@
   "bugs": {
     "url": "https://github.com/LucaBonamino/Clavimit/issues"
   },
-  "homepage": "https://github.com/LucaBonamino/Clavimit#readme"
+  "homepage": "https://github.com/LucaBonamino/Clavimit#readme",
+  "main": "index.js",
+  "keywords": [],
+  "devDependencies": {
+    "vitest": "^4.1.10"
+  }
 }

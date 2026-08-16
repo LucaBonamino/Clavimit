@@ -55,7 +55,7 @@ export async function encryptMessage(text, publicKeyPem) {
     };
 }
 
-async function importPublicKey(pem) {
+export async function importPublicKey(pem) {
     try {
         if (!pem.includes("-----BEGIN PUBLIC KEY-----") ||
             !pem.includes("-----END PUBLIC KEY-----")) {
@@ -114,28 +114,15 @@ async function importPublicKey(pem) {
 }
 
 
-// export function composeMessage(encrypted) {
-//     const message = {
-//         version: 1,
-//         algorithm: "AES-256-GCM",
-//         keyAlgorithm: "RSA-OAEP-SHA256",
-
-//         encryptedKey: encrypted.encryptedKey,
-//         iv: encrypted.iv,
-//         ciphertext: encrypted.ciphertext
-//     };
-
-//     return `-----BEGIN CIPHER MAIL-----
-
-// ${JSON.stringify(message)}
-
-// -----END CIPHER MAIL-----`;
-// }
-
-
-
 export async function importPrivateKey(pem) {
     try {
+        if (!pem.includes("-----BEGIN PRIVATE KEY-----") ||
+            !pem.includes("-----END PRIVATE KEY-----")) {
+            throw new ClavimitError(
+                "INVALID_PRIVATE_KEY",
+                "The private key could not be read. Expected -----BEGIN PRIVATE KEY-----"
+            );
+        }
         const cleanPem = pem
             .replace("-----BEGIN PRIVATE KEY-----", "")
             .replace("-----END PRIVATE KEY-----", "")
@@ -162,18 +149,6 @@ export async function importPrivateKey(pem) {
     }
 }
 
-function fromHex(hex) {
-    const bytes = new Uint8Array(hex.length / 2);
-
-    for (let i = 0; i < bytes.length; i++) {
-        bytes[i] = parseInt(
-            hex.substring(i * 2, i * 2 + 2),
-            16
-        );
-    }
-
-    return bytes;
-}
 
 function fromBase64(base64) {
     const binary = atob(base64);
