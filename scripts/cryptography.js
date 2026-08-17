@@ -22,7 +22,18 @@ export async function encrypt(text, key) {
     };
 }
 
-export async function encryptMessage(text, publicKeyPem) {
+async function encryptAESKey(rsaKey, AesKey) {
+    const encKey = await crypto.subtle.encrypt(
+        {
+            name: "RSA-OAEP"
+        },
+        rsaKey,
+        AesKey
+    );
+    return encKey
+}
+
+export async function encryptMessage(text, publicKeyPem, senderPublicKeyPem) {
     const key = await crypto.subtle.generateKey(
         {
             name: "AES-GCM",
@@ -33,23 +44,45 @@ export async function encryptMessage(text, publicKeyPem) {
     );
 
     const encryptedText = await encrypt(text, key);
-    const rsaKey = await importPublicKey(publicKeyPem);
+
+    let recipientRsaKey;
+    try {
+        recipientRsaKey = await importPublicKey(publicKeyPem);
+    } catch {
+        throw new ClavimitError(
+            "INVALID_RECIPIENT_PUBLIC_KEY",
+            "The recipient's public key could not be read."
+        );
+    }
 
     const rawKey = await crypto.subtle.exportKey(
         "raw",
         key
     );
 
-    const encKey = await crypto.subtle.encrypt(
-        {
-            name: "RSA-OAEP"
-        },
-        rsaKey,
-        rawKey
-    );
-
+    const encKey = await encryptAESKey(recipientRsaKey, rawKey);
+    let senderEncKey = null;
+    if (senderPublicKeyPem) {
+        let senderRsaKey;
+        try {
+            senderRsaKey = await importPublicKey(senderPublicKeyPem);
+        } catch {
+            throw new ClavimitError(
+                "INVALID_SENDER_PUBLIC_KEY",
+                "The sender's public key could not be read."
+            );
+        }
+        senderEncKey = toBase64(await encryptAESKey(senderRsaKey, rawKey));
+    }
+    // if (senderPublicKeyPem != null) {
+    //     const senderRsaKey = await importPublicKey(senderPublicKeyPem);
+    //     senderEncKey = toBase64(await encryptAESKey(senderRsaKey, rawKey));
+    // }
     return {
-        encryptedKey: toBase64(encKey),
+        encryptedKeys: {
+            recipient: toBase64(encKey),
+            sender: senderEncKey
+        },
         ciphertext: encryptedText.ciphertext,
         iv: encryptedText.iv
     };
@@ -178,19 +211,34 @@ function toBase64(data) {
 
 export async function decryptMessage(message, privateKeyPem) {
     const privateKey = await importPrivateKey(privateKeyPem);
-    const encryptedKey = fromBase64(message.encryptedKey);
 
     let rawAesKey;
 
-    try {
-        rawAesKey = await crypto.subtle.decrypt(
-            {
-                name: "RSA-OAEP"
-            },
-            privateKey,
-            encryptedKey
-        );
-    } catch (error) {
+    const encryptedKeys = [
+        message.encryptedKeys.recipient,
+        message.encryptedKeys.sender
+    ];
+
+    for (const encryptedKey of encryptedKeys) {
+        if (!encryptedKey) {
+            continue;
+        }
+
+        try {
+            rawAesKey = await crypto.subtle.decrypt(
+                {
+                    name: "RSA-OAEP"
+                },
+                privateKey,
+                fromBase64(encryptedKey)
+            );
+            break;
+        } catch (error) {
+            // This encrypted AES key does not belong to the provided private key.
+        }
+    }
+
+    if (!rawAesKey) {
         throw new ClavimitError(
             "DECRYPTION_FAILED",
             "The encryption key could not be decrypted with this private key."
@@ -206,14 +254,11 @@ export async function decryptMessage(message, privateKeyPem) {
         false,
         ["decrypt"]
     );
-
     const iv = fromBase64(message.iv);
     const ciphertext = fromBase64(message.ciphertext);
 
-    let decrypted;
-
     try {
-        decrypted = await crypto.subtle.decrypt(
+        const decrypted = await crypto.subtle.decrypt(
             {
                 name: "AES-GCM",
                 iv: iv
@@ -221,12 +266,13 @@ export async function decryptMessage(message, privateKeyPem) {
             aesKey,
             ciphertext
         );
+
+        return new TextDecoder().decode(decrypted);
+
     } catch (error) {
         throw new ClavimitError(
             "DECRYPTION_FAILED",
             "The message could not be decrypted."
         );
     }
-
-    return new TextDecoder().decode(decrypted);
 }

@@ -81,7 +81,11 @@
 				<input type="file" id="publicKeyFile" accept=".pem,.key,.txt">
 				<p id="encryptError" class="error-message" hidden></p>
 				<textarea id="publicKey" rows="8" placeholder="-----BEGIN PUBLIC KEY-----"></textarea>
-
+				<input type="checkbox" id="encryptWithSenderPublicKey"> Keep a decryptable copy for the sender
+				<div id="encryptWithSenderPublicKeyDiv" hidden>
+					<input type="file", id="senderPublicKeyFile", accept=".pem,.key,.txt">
+					<textarea id="senderPublicKey", rows="8", placeholder="-----BEGIN PUBLIC KEY-----"></textarea>
+				</div>
 				<button id="enc">
 					Encrypt Email
 				</button>

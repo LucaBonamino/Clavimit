@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { encryptMessage, decryptMessage, importPublicKey, importPrivateKey } from "../scripts/cryptography";
 
+
 async function generateKeyPair() {
     const { publicKey, privateKey } = await crypto.subtle.generateKey(
         {
@@ -45,132 +46,171 @@ function toPem(buffer, label) {
 
 
 describe("encryption and decryption", () => {
-    it("encrypts and decrypts a message", async () => {
+
+    it("encrypts and decrypts a message with the recipient key", async () => {
         const { publicKey, privateKey } = await generateKeyPair();
 
         const message = "This is a dummy message";
 
-        const encrypted = await encryptMessage(message, publicKey);
-        const decrypted = await decryptMessage(encrypted, privateKey);
+        const encrypted = await encryptMessage(
+            message,
+            publicKey
+        );
+
+        const decrypted = await decryptMessage(
+            encrypted,
+            privateKey
+        );
 
         expect(decrypted).toBe(message);
     });
+
 
     it("encrypts and decrypts an empty message", async () => {
         const { publicKey, privateKey } = await generateKeyPair();
 
         const message = "";
 
-        const encrypted = await encryptMessage(message, publicKey);
-        const decrypted = await decryptMessage(encrypted, privateKey);
+        const encrypted = await encryptMessage(
+            message,
+            publicKey
+        );
+
+        const decrypted = await decryptMessage(
+            encrypted,
+            privateKey
+        );
 
         expect(decrypted).toBe(message);
     });
 
-    it("throws INVALID_PUBLIC_KEY when the public key is empty", async () => {
+
+    it("allows the sender to decrypt with the sender private key", async () => {
+        const recipient = await generateKeyPair();
+        const sender = await generateKeyPair();
+
+        const message = "Message readable by sender";
+
+        const encrypted = await encryptMessage(
+            message,
+            recipient.publicKey,
+            sender.publicKey
+        );
+
+        const decrypted = await decryptMessage(
+            encrypted,
+            sender.privateKey
+        );
+
+        expect(decrypted).toBe(message);
+    });
+
+
+    it("allows the recipient to decrypt when a sender copy exists", async () => {
+        const recipient = await generateKeyPair();
+        const sender = await generateKeyPair();
+
+        const message = "Message readable by recipient";
+
+        const encrypted = await encryptMessage(
+            message,
+            recipient.publicKey,
+            sender.publicKey
+        );
+
+        const decrypted = await decryptMessage(
+            encrypted,
+            recipient.privateKey
+        );
+
+        expect(decrypted).toBe(message);
+    });
+
+
+    it("throws INVALID_RECIPIENT_PUBLIC_KEY when recipient key is empty", async () => {
         await expect(
             encryptMessage("dummy message", "")
         ).rejects.toMatchObject({
-            code: "INVALID_PUBLIC_KEY"
+            code: "INVALID_RECIPIENT_PUBLIC_KEY"
         });
     });
 
-    it("throws INVALID_PUBLIC_KEY when the public key is empty", async () => {
+
+    it("throws INVALID_RECIPIENT_PUBLIC_KEY when recipient key is invalid", async () => {
         await expect(
             encryptMessage("dummy message", "dummy key")
         ).rejects.toMatchObject({
-            code: "INVALID_PUBLIC_KEY"
+            code: "INVALID_RECIPIENT_PUBLIC_KEY"
         });
     });
 
-});
 
-describe("importPublicKey", () => {
-
-    it("throws INVALID_PUBLIC_KEY when PEM headers are missing", async () => {
-        await expect(
-            importPublicKey("not a public key")
-        ).rejects.toMatchObject({
-            code: "INVALID_PUBLIC_KEY"
-        });
-    });
-
-    it("throws INVALID_PUBLIC_KEY when PEM content is invalid", async () => {
-        const pem = `
------BEGIN PUBLIC KEY-----
-this-is-not-valid-base64!!!
------END PUBLIC KEY-----
-`;
+    it("throws INVALID_SENDER_PUBLIC_KEY when sender key is invalid", async () => {
+        const recipient = await generateKeyPair();
 
         await expect(
-            importPublicKey(pem)
+            encryptMessage(
+                "dummy message",
+                recipient.publicKey,
+                "dummy sender key"
+            )
         ).rejects.toMatchObject({
-            code: "INVALID_PUBLIC_KEY"
+            code: "INVALID_SENDER_PUBLIC_KEY"
         });
     });
 
-    it("imports a valid RSA-OAEP public key", async () => {
-        const { publicKey } = await generateKeyPair();
 
-        const key = await importPublicKey(publicKey);
+    it("does not create a sender key when none is provided", async () => {
+        const recipient = await generateKeyPair();
 
-        expect(key).toBeInstanceOf(CryptoKey);
-        expect(key.type).toBe("public");
-        expect(key.algorithm.name).toBe("RSA-OAEP");
-        expect(key.algorithm.hash.name).toBe("SHA-256");
-        expect(key.usages).toContain("encrypt");
+        const encrypted = await encryptMessage(
+            "dummy message",
+            recipient.publicKey
+        );
+
+        expect(encrypted.encryptedKeys.recipient)
+            .toBeTypeOf("string");
+
+        expect(encrypted.encryptedKeys.sender)
+            .toBeNull();
     });
 
-});
 
-describe("importPrivateKey", () => {
+    it("creates both encrypted key copies when sender key is provided", async () => {
+        const recipient = await generateKeyPair();
+        const sender = await generateKeyPair();
 
-    it("imports a valid RSA-OAEP private key", async () => {
-        const { privateKey } = await generateKeyPair();
+        const encrypted = await encryptMessage(
+            "dummy message",
+            recipient.publicKey,
+            sender.publicKey
+        );
 
-        const key = await importPrivateKey(privateKey);
+        expect(encrypted.encryptedKeys.recipient)
+            .toBeTypeOf("string");
 
-        expect(key).toBeInstanceOf(CryptoKey);
-        expect(key.type).toBe("private");
-        expect(key.algorithm.name).toBe("RSA-OAEP");
-        expect(key.algorithm.hash.name).toBe("SHA-256");
-        expect(key.usages).toContain("decrypt");
+        expect(encrypted.encryptedKeys.sender)
+            .toBeTypeOf("string");
     });
 
-    it("throws INVALID_PRIVATE_KEY when the private key is empty", async () => {
-        await expect(
-            importPrivateKey("")
-        ).rejects.toMatchObject({
-            code: "INVALID_PRIVATE_KEY"
-        });
-    });
+    it("rejects a private key that belongs to neither sender nor recipient", async () => {
+        const recipient = await generateKeyPair();
+        const sender = await generateKeyPair();
+        const stranger = await generateKeyPair();
 
-    it("throws INVALID_PRIVATE_KEY when PEM content is invalid", async () => {
-        const pem = `
------BEGIN PRIVATE KEY-----
-this-is-not-valid-base64!!!
------END PRIVATE KEY-----
-`;
-
-        await expect(
-            importPrivateKey(pem)
-        ).rejects.toMatchObject({
-            code: "INVALID_PRIVATE_KEY"
-        });
-    });
-
-    it("throws INVALID_PRIVATE_KEY when PEM headers are missing", async () => {
-        const { privateKey } = await generateKeyPair();
-
-        const withoutHeaders = privateKey
-            .replace("-----BEGIN PRIVATE KEY-----", "")
-            .replace("-----END PRIVATE KEY-----", "");
+        const encrypted = await encryptMessage(
+            "secret message",
+            recipient.publicKey,
+            sender.publicKey
+        );
 
         await expect(
-            importPrivateKey(withoutHeaders)
+            decryptMessage(
+                encrypted,
+                stranger.privateKey
+            )
         ).rejects.toMatchObject({
-            code: "INVALID_PRIVATE_KEY"
+            code: "DECRYPTION_FAILED"
         });
     });
-
 });

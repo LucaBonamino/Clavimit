@@ -8,6 +8,7 @@ Clavimit does not require an account or a Clavimit server.
 
 ## How it works
 
+### Encrypting
 When encrypting a message:
 
 1. Write an email in Gmail.
@@ -16,15 +17,17 @@ When encrypting a message:
 
    * pasting the key, or
    * selecting a public-key file.
-4. Click **Encrypt**.
+4. Optionally enable **Keep a decryptable copy for the sender** and provide the sender's RSA public key.
+5. Click **Encrypt**.
 
 Clavimit generates a new AES-256 key for each message and encrypts the email content using AES-GCM.
 
-The AES key is then encrypted using the recipient's RSA public key with RSA-OAEP.
+The AES key is encrypted using the recipient's RSA public key with RSA-OAEP. If **Keep a decryptable copy for the sender** is enabled, the same AES key is also encrypted using the sender's RSA public key. Encrypting the AES key separately for the recipient and sender allows either party to decrypt the same encrypted message using their own RSA private key.
 
 The encrypted email contains the information required for the recipient to decrypt it, including:
 
 * the encrypted AES key
+* the encrypted AES key for the sender, when enabled
 * the initialization vector (IV)
 * the encrypted message
 * the algorithm identifiers
@@ -38,8 +41,7 @@ Encrypted messages are wrapped in a Clavimit message block:
 -----END CLAVIMIT MAIL-----
 ```
 
-## Decryption
-
+### Decryption
 To decrypt a Clavimit message:
 
 1. Open the encrypted email in Gmail.
@@ -50,9 +52,13 @@ To decrypt a Clavimit message:
    * selecting a private-key file.
 4. Click **Decrypt**.
 
-Clavimit decrypts the AES key using the RSA private key and then uses that AES key to decrypt the message.
+Clavimit attempts to decrypt the message AES key using the provided RSA private key. If the message contains both recipient and sender encrypted-key copies, Clavimit automatically uses the one that can be decrypted with the supplied private key.
+
+The recovered AES key is then used to decrypt the email content.
 
 The resulting plaintext is displayed by the extension.
+
+The **Keep a decryptable copy for the sender** feature allows the senders to decrypt their own messages from Gmail's Sent section.
 
 ## Cryptography
 
@@ -68,7 +74,9 @@ Clavimit does not implement cryptographic primitives itself.
 
 ## Key ownership
 
-Clavimit does not manage or persist cryptographic keys.
+For encryption, Clavimit requires the recipient's **public key**. The sender may optionally provide their own public key to keep a decryptable copy of the message.
+
+For decryption, Clavimit requires a **private key** corresponding to one of the public keys used during encryption.
 
 Users remain responsible for generating, storing, backing up, exchanging, and verifying their own RSA keys.
 
@@ -153,6 +161,7 @@ The current implementation supports:
 
 * Gmail message encryption
 * Gmail message decryption
+* Optional sender-side decryption by encrypting the AES key for both recipient and sender
 * RSA public keys provided as pasted text or files
 * RSA private keys provided as pasted text or files
 * AES-256-GCM message encryption
@@ -177,7 +186,6 @@ The next planned improvements focus on extending the current email workflow and 
 * **Secure compose mode** — allow users to write the plaintext message inside Clavimit so that only the encrypted content is inserted into Gmail.
 * **Attachment encryption** — encrypt email attachments together with the message content.
 * **Formatted decrypted messages** — correctly display decrypted HTML and structured message content instead of showing the raw representation.
-* **Sent-message decryption** — allow senders to decrypt messages they previously encrypted, potentially by encrypting the per-message AES key for both the recipient and the sender.
 * **Symmetric encryption mode** — optionally allow encryption using a user-provided symmetric key for situations where both parties already share a secret.
 * **Improved Gmail integration** — make message detection and compose-window handling more robust.
 * **Automated tests** — add tests for cryptographic operations, message formatting, corrupted messages, invalid keys, and edge cases.

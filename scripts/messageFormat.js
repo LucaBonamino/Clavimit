@@ -12,7 +12,7 @@ export function createMessageBody(encrypted) {
         version: PAYLOAD_VERSION,
         algorithm: ALGORITHM,
         keyAlgorithm: KEY_ALGORITHM,
-        encryptedKey: encrypted.encryptedKey,
+        encryptedKeys: encrypted.encryptedKeys,
         iv: encrypted.iv,
         ciphertext: encrypted.ciphertext
     };
@@ -62,11 +62,18 @@ export function validateMessage(message) {
     if (!message){
         return false;
     }
-    return (
+     return (
         message.version === PAYLOAD_VERSION &&
         message.algorithm === ALGORITHM &&
         message.keyAlgorithm === KEY_ALGORITHM &&
-        typeof message.encryptedKey === "string" &&
+        typeof message.encryptedKeys === "object" &&
+        typeof message.encryptedKeys.recipient === "string" &&
+
+        (
+            message.encryptedKeys.sender === null ||
+            typeof message.encryptedKeys.sender === "string"
+        ) &&
+
         typeof message.iv === "string" &&
         typeof message.ciphertext === "string"
     );
