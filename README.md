@@ -185,8 +185,6 @@ The next planned improvements focus on extending the current email workflow and 
 * **Attachment encryption** — encrypt email attachments together with the message content.
 * **Formatted decrypted messages** — correctly display decrypted HTML and structured message content instead of showing the raw representation.
 * **Symmetric encryption mode** — optionally allow encryption using a user-provided symmetric key for situations where both parties already share a secret.
-* **Improved Gmail integration** — make message detection and compose-window handling more robust.
-* **Automated tests** — add tests for cryptographic operations, message formatting, corrupted messages, invalid keys, and edge cases.
 
 ### Potential future features
 
