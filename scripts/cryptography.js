@@ -276,3 +276,45 @@ export async function decryptMessage(message, privateKeyPem) {
         );
     }
 }
+
+export async function generateKeyPair() {
+    const { publicKey, privateKey } = await crypto.subtle.generateKey(
+        {
+            name: "RSA-OAEP",
+            modulusLength: 4096,
+            publicExponent: new Uint8Array([1, 0, 1]),
+            hash: "SHA-256"
+        },
+        true,
+        ["encrypt", "decrypt"]
+    );
+
+    const publicKeyBuffer = await crypto.subtle.exportKey(
+        "spki",
+        publicKey
+    );
+
+    const privateKeyBuffer = await crypto.subtle.exportKey(
+        "pkcs8",
+        privateKey
+    );
+
+    return {
+        publicKey: toPem(publicKeyBuffer, "PUBLIC KEY"),
+        privateKey: toPem(privateKeyBuffer, "PRIVATE KEY")
+    };
+}
+
+function toPem(buffer, label) {
+    const bytes = new Uint8Array(buffer);
+
+    let binary = "";
+    for (const byte of bytes) {
+        binary += String.fromCharCode(byte);
+    }
+
+    const base64 = btoa(binary);
+    const lines = base64.match(/.{1,64}/g).join("\n");
+
+    return `-----BEGIN ${label}-----\n${lines}\n-----END ${label}-----`;
+}

@@ -22,6 +22,44 @@
 			</p>
 		</header>
 
+		<!-- RSA key generation -->
+		<details class="card" id="keyGeneration">
+			<summary class="card-header">
+				<h2>Generate RSA keys</h2>
+			</summary>
+			<p>
+				Optionally generate a new RSA key pair for use with Clavimit.
+				You can also use an existing compatible RSA key pair.
+			</p>
+			<div id="generatedKeys" hidden>
+				<label for="generatedPublicKey">
+					Public Key
+				</label>
+
+				<textarea id="generatedPublicKey" rows="8" readonly>
+        </textarea>
+
+				<button id="downloadPublicKey">
+					Download public key
+				</button>
+
+				<label for="generatedPrivateKey">
+					Private Key
+				</label>
+
+				<textarea id="generatedPrivateKey" rows="8" readonly>
+        </textarea>
+
+				<button id="downloadPrivateKey">
+					Download private key
+				</button>
+			</div>
+			</br>
+			<button id="generateKeyPair">
+				Generate RSA key pair
+			</button>
+
+		</details>
 
 		<!-- DECRYPT -->
 
@@ -83,8 +121,8 @@
 				<textarea id="publicKey" rows="8" placeholder="-----BEGIN PUBLIC KEY-----"></textarea>
 				<input type="checkbox" id="encryptWithSenderPublicKey"> Keep a decryptable copy for the sender
 				<div id="encryptWithSenderPublicKeyDiv" hidden>
-					<input type="file", id="senderPublicKeyFile", accept=".pem,.key,.txt">
-					<textarea id="senderPublicKey", rows="8", placeholder="-----BEGIN PUBLIC KEY-----"></textarea>
+					<input type="file" , id="senderPublicKeyFile" , accept=".pem,.key,.txt">
+					<textarea id="senderPublicKey" , rows="8" , placeholder="-----BEGIN PUBLIC KEY-----"></textarea>
 				</div>
 				<button id="enc">
 					Encrypt Email

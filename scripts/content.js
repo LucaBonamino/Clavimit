@@ -1,4 +1,4 @@
-import { encryptMessage, decryptMessage } from "./cryptography.js";
+import { encryptMessage, decryptMessage, generateKeyPair } from "./cryptography.js";
 import { getReceivedEmailText, setEmailText, getInputEmailText } from "./emailParser.js"
 import { parseMessage, composeMessage } from "./messageFormat.js";
 import { ClavimitError } from "./exeptions.js";
@@ -28,6 +28,19 @@ function clearEncryptError() {
     encryptError.hidden = true;
 }
 
+function downloadPem(filename, pem) {
+    const blob = new Blob(
+        [pem],
+        { type: "application/x-pem-file" }
+    );
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = filename;
+    link.click();
+    URL.revokeObjectURL(url);
+}
+
 const button = document.getElementById("enc");
 const publicKeyInput = document.getElementById("publicKey");
 const privateKeyInput = document.getElementById("privateKey");
@@ -42,7 +55,38 @@ const senderPublicKeyFile = document.getElementById("senderPublicKeyFile");
 
 const encryptWithSenderKeyCheckBox = document.getElementById("encryptWithSenderPublicKey");
 
+const generateRsaKeyPairButton = document.getElementById("generateKeyPair");
+const generatedKeys = document.getElementById("generatedKeys");
+const generatedPublicKey = document.getElementById("generatedPublicKey");
+const generatedPrivateKey = document.getElementById("generatedPrivateKey");
 
+generateRsaKeyPairButton.addEventListener("click", async () => {
+    const keyPair = await generateKeyPair();
+    generatedPublicKey.value = keyPair.publicKey;
+    generatedPrivateKey.value = keyPair.privateKey;
+
+    generatedKeys.hidden = false;
+})
+
+
+document
+    .getElementById("downloadPublicKey")
+    .addEventListener("click", () => {
+        downloadPem(
+            "clavimit-public.pem",
+            generatedPublicKey.value
+        );
+    });
+
+document
+    .getElementById("downloadPrivateKey")
+    .addEventListener("click", () => {
+        downloadPem(
+            "clavimit-private.pem",
+            generatedPrivateKey.value
+        );
+    });
+    
 encryptWithSenderKeyCheckBox.addEventListener("change", () => {
     const encryptWithSenderKeyDiv = document.getElementById("encryptWithSenderPublicKeyDiv");
     encryptWithSenderKeyDiv.hidden = !encryptWithSenderKeyCheckBox.checked;

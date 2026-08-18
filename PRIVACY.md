@@ -1,6 +1,6 @@
 # Clavimit Privacy Policy
 
-**Last updated: August 14, 2026**
+**Last updated: August 18, 2026**
 
 Clavimit is a Chrome extension for encrypting and decrypting Gmail messages locally in the user's browser.
 
@@ -20,23 +20,26 @@ Clavimit accesses this information only as necessary to perform encryption, decr
 
 ## Cryptographic keys
 
-Clavimit does not manage users' cryptographic keys.
+Clavimit does not manage or store users' cryptographic keys.
 
-Public and private keys must be supplied by the user when required, either by:
+Public and private keys may be supplied by the user when required by:
 
 * pasting the key into Clavimit, or
 * selecting a key file from the user's device.
+
+Clavimit can also optionally generate an RSA key pair locally in the browser. Generated keys are shown to the user and may be downloaded for later use.
 
 Clavimit does not intentionally:
 
 * upload cryptographic keys to a server
 * synchronize keys between devices
-* permanently store private keys in the browser
+* store private keys in the browser
 * provide key backup or recovery
 * distribute public keys
 * verify the identity of the owner of a public key
 
-Key generation, storage, backup, distribution, and identity verification remain the responsibility of the user.
+Users remain responsible for securely storing, backing up, exchanging, and verifying cryptographic keys, including keys generated with Clavimit.
+
 
 ## Email content
 

@@ -60,6 +60,9 @@ The resulting plaintext is displayed by the extension.
 
 The **Keep a decryptable copy for the sender** feature allows the senders to decrypt their own messages from Gmail's Sent section.
 
+### RSA key generation
+Clavimit can optionally generate an RSA key pair for you. This is not required; you can also use your existing compatible RSA keys.
+
 ## Cryptography
 
 Clavimit currently uses:
@@ -78,17 +81,12 @@ For encryption, Clavimit requires the recipient's **public key**. The sender may
 
 For decryption, Clavimit requires a **private key** corresponding to one of the public keys used during encryption.
 
-Users remain responsible for generating, storing, backing up, exchanging, and verifying their own RSA keys.
+Users remain responsible for storing, backing up, exchanging, and verifying their own RSA keys. Keys can be generated independently or optionally generated locally using Clavimit.
 
 Keys are provided to Clavimit only when they are needed, either by pasting them into the extension or selecting a key file.
 
-For encryption, Clavimit requires the recipient's **public key**.
-
-For decryption, Clavimit requires the corresponding **private key**.
-
 Clavimit does not intentionally:
 
-* generate user key pairs
 * upload keys to a server
 * synchronize keys between devices
 * permanently store private keys in the browser
