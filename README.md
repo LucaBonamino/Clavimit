@@ -14,11 +14,13 @@ When encrypting a message:
 1. Write an email in Gmail.
 2. Open Clavimit.
 3. Provide the recipient's RSA public key by:
-
    * pasting the key, or
    * selecting a public-key file.
-4. Optionally enable **Keep a decryptable copy for the sender** and provide the sender's RSA public key.
-5. Click **Encrypt**.
+4. Choose a compose mode:
+   * **Gmail compose** - encrypt the message currently written in Gmail.
+   * **Secure compose** - write the plaintext message directly inside Clavimit. Clavimit opens a Gmail compose window automatically and inserts only the encrypted message. 
+5. Optionally enable **Keep a decryptable copy for the sender** and provide the sender's RSA public key.
+6. Click **Encrypt**.
 
 Clavimit generates a new AES-256 key for each message and encrypts the email content using AES-GCM.
 
@@ -108,15 +110,13 @@ For more details, see [Privacy Policy](PRIVACY.md).
 
 ### Gmail draft limitation
 
-Clavimit currently encrypts the message after it has been written in Gmail's compose window.
+When using **Gmail compose**, Clavimit encrypts the message after it has already been written in Gmail's compose window.
 
-Gmail may automatically save the plaintext message as a draft before Clavimit applies encryption.
+Gmail may automatically save the plaintext message as a draft before Clavimit applies encryption. Therefore, Gmail compose mode does **not** protect the plaintext message from Gmail while it is being composed.
 
 Therefore, the current version of Clavimit does **not** protect the plaintext message from Gmail itself while the message is being composed.
 
-Clavimit primarily protects the content of the email after encryption has been applied.
-
-A future secure-compose mode could avoid placing plaintext message content inside Gmail before encryption.
+When using **Secure compose**, the plaintext is written inside Clavimit instead. Clavimit encrypts the message locally, opens a Gmail compose window if necessary, and inserts only the encrypted message into Gmail.
 
 ## Security limitations
 
@@ -159,6 +159,7 @@ The current implementation supports:
 
 * Gmail message encryption
 * Gmail message decryption
+* Gmail and secure compose modes
 * Optional sender-side decryption by encrypting the AES key for both recipient and sender
 * RSA public keys provided as pasted text or files
 * RSA private keys provided as pasted text or files

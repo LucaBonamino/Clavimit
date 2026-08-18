@@ -1,5 +1,5 @@
 import { encryptMessage, decryptMessage, generateKeyPair } from "./cryptography.js";
-import { getReceivedEmailText, setEmailText, getInputEmailText } from "./emailParser.js"
+import { getReceivedEmailText, setEmailText, getInputEmailText, openComposeWindow } from "./emailParser.js"
 import { parseMessage, composeMessage } from "./messageFormat.js";
 import { ClavimitError } from "./exeptions.js";
 
@@ -55,6 +55,7 @@ const senderPublicKeyFile = document.getElementById("senderPublicKeyFile");
 
 const encryptWithSenderKeyCheckBox = document.getElementById("encryptWithSenderPublicKey");
 
+// -------- Key generation
 const generateRsaKeyPairButton = document.getElementById("generateKeyPair");
 const generatedKeys = document.getElementById("generatedKeys");
 const generatedPublicKey = document.getElementById("generatedPublicKey");
@@ -86,12 +87,28 @@ document
             generatedPrivateKey.value
         );
     });
-    
+// --------
+
+// Emails writing modes
+const secureCompose = document.getElementById("secureCompose");
+const secureMessageInput = document.getElementById("secureMessage");
+const secureComposeDiv = document.getElementById("secureComposeDiv");
+secureCompose.addEventListener("change", () => {
+    secureComposeDiv.hidden = !secureCompose.checked;
+});
+
+gmailCompose.addEventListener("change", () => {
+    secureComposeDiv.hidden = !secureCompose.checked;
+});
+//
+
+// Encryption with sender public key
 encryptWithSenderKeyCheckBox.addEventListener("change", () => {
     const encryptWithSenderKeyDiv = document.getElementById("encryptWithSenderPublicKeyDiv");
     encryptWithSenderKeyDiv.hidden = !encryptWithSenderKeyCheckBox.checked;
 })
 
+// Import RSA keys by file
 privateKeyFile.addEventListener("change", async () => {
     const file = privateKeyFile.files[0];
     if (!file) {
@@ -118,8 +135,9 @@ senderPublicKeyFile.addEventListener("change", async () => {
     const text = await file.text();
     document.getElementById("senderPublicKey").value = text;
 });
+//
 
-
+// Email decryption handler
 decryptButton.addEventListener("click", async () => {
     clearDecryptError();
     try {
@@ -147,6 +165,7 @@ decryptButton.addEventListener("click", async () => {
 
 });
 
+// Email encryption handler
 button.addEventListener("click", async () => {
     clearEncryptError();
     try {
@@ -157,10 +176,10 @@ button.addEventListener("click", async () => {
                 "Please enter the recipient's public key."
             )
         }
-        
+
         let senderPublicKey = null;
         if (encryptWithSenderKeyCheckBox.checked) {
-             senderPublicKey = senderPublicKeyInput.value.trim();
+            senderPublicKey = senderPublicKeyInput.value.trim();
 
             if (!senderPublicKey) {
                 throw new ClavimitError(
@@ -169,8 +188,23 @@ button.addEventListener("click", async () => {
                 );
             }
         }
-        const text = await getInputEmailText();
-        
+        let text;
+        if (secureCompose.checked) {
+            text = secureMessageInput.value;
+            const opened = await openComposeWindow();
+
+            if (!opened) {
+                throw new ClavimitError(
+                    "COMPOSE_NOT_FOUND",
+                    "Clavimit could not open a Gmail compose window."
+                );
+            }
+        }
+        else {
+            text = await getInputEmailText();
+        }
+
+
         if (!text?.trim()) {
             throw new ClavimitError(
                 "EMPTY_MESSAGE",
@@ -183,7 +217,6 @@ button.addEventListener("click", async () => {
             senderPublicKey
         );
         const message = composeMessage(enc);
-
         await setEmailText(message);
         publicKeyInput.value = "";
         if (senderPublicKeyInput.value) {

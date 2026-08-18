@@ -245,3 +245,50 @@ export async function isMessageOpen() {
 
     return results[0]?.result ?? false;
 }
+
+
+export async function openComposeWindow() {
+    const [tab] = await chrome.tabs.query({
+        active: true,
+        currentWindow: true
+    });
+
+    const results = await chrome.scripting.executeScript({
+        target: { tabId: tab.id },
+
+        func: async () => {
+            function findEditor() {
+                return [...document.querySelectorAll(
+                    '[g_editable="true"][contenteditable="true"][role="textbox"]'
+                )].find(el => {
+                    const rect = el.getBoundingClientRect();
+                    return rect.width > 0 &&
+                           rect.height > 0;
+                });
+            }
+
+            // The compositor is already opened
+            if (findEditor()) {
+                return true;
+            }
+
+            // The compositor is not already opened, open it
+            const composeButton = document.querySelector('[gh="cm"]');
+            if (!composeButton) {
+                return false;
+            }
+
+            composeButton.click();
+            // Wait until Gmail creates the compose editor
+            for (let i = 0; i < 20; i++) {
+                await new Promise(resolve => setTimeout(resolve, 100));
+                if (findEditor()) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    });
+
+    return results[0]?.result;
+}

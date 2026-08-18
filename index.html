@@ -124,6 +124,32 @@
 					<input type="file" , id="senderPublicKeyFile" , accept=".pem,.key,.txt">
 					<textarea id="senderPublicKey" , rows="8" , placeholder="-----BEGIN PUBLIC KEY-----"></textarea>
 				</div>
+				<fieldset>
+					<legend>Compose mode</legend>
+
+					<label>
+						<input type="radio" id="gmailCompose" name="composeMode" value="gmail" checked>
+						Gmail compose
+					</label>
+
+					<label>
+						<input type="radio" id="secureCompose" name="composeMode" value="secure">
+						Secure compose
+					</label>
+				</fieldset>
+
+				<div id="secureComposeDiv" hidden>
+					<label for="secureMessage">
+						Secure message
+					</label>
+
+					<p class="help">
+						Write the plaintext here. Only the encrypted message
+						will be inserted into Gmail.
+					</p>
+
+					<textarea id="secureMessage" rows="10" placeholder="Write your message here..."></textarea>
+				</div>
 				<button id="enc">
 					Encrypt Email
 				</button>

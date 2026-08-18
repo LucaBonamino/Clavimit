@@ -45,7 +45,9 @@ Users remain responsible for securely storing, backing up, exchanging, and verif
 
 Clavimit accesses Gmail message content only when required to perform an operation requested by the user.
 
-For encryption, the plaintext message is read from the Gmail compose window, encrypted locally, and replaced with the resulting encrypted Clavimit message.
+For encryption, Clavimit supports two compose modes:
+* **Gmail compose** - the plaintext message is read from the Gmail compose window, encrypted locally, and replaced with the resulting encrypted Clavimit message.
+* **Secure compose** - the plaintext message is written inside Clavimit and encrypted locally before being inserted into Gmail. If necessary, Clavimit opens a Gmail compose window and inserts only the encrypted message.
 
 For decryption, the encrypted message is read from Gmail and decrypted locally using the private key supplied by the user.
 
@@ -106,11 +108,11 @@ Clavimit does not use these permissions for advertising, tracking, or monitoring
 
 ## Gmail and plaintext drafts
 
-Clavimit currently encrypts a message after the plaintext has been written in Gmail's compose window.
+When using **Gmail compose**, Clavimit encrypts a message after the plaintext has already been entered into Gmail's compose window.
 
-Gmail may automatically save the plaintext message as a draft before Clavimit applies encryption.
+Gmail may automatically save that plaintext message as a draft before Clavimit applies encryption. As a result, Gmail compose mode does not prevent Gmail from processing or storing plaintext that has already been entered into Gmail.
 
-As a result, the current version of Clavimit does not prevent Gmail from processing or storing plaintext that has already been entered into Gmail.
+When using **Secure compose**, the plaintext message is written inside Clavimit instead of Gmail. Clavimit encrypts the message locally and inserts only the resulting encrypted message into Gmail. This reduces the risk of Gmail creating a plaintext draft before encryption.
 
 Clavimit does not control Gmail's storage or processing of email data. Google's handling of Gmail data is governed by Google's own terms and privacy policies.
 
