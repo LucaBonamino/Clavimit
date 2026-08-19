@@ -192,3 +192,7 @@ input:focus-visible {
     outline-offset: 2px;
     border-radius: 4px;
 }
+
+.mit {
+    color: var(--accent);
+}
