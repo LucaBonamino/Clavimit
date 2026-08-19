@@ -1,3 +1,37 @@
+:root {
+    color-scheme: light dark;
+
+    --background: #f7f7f7;
+    --surface: #ffffff;
+
+    --text: #202020;
+    --text-secondary: #666666;
+
+    --border: #d8d8d8;
+
+    --accent: #f97316;
+    --accent-hover: #ea580c;
+
+    --danger: #c62828;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --background: #181818;
+        --surface: #242424;
+
+        --text: #f5f5f5;
+        --text-secondary: #b5b5b5;
+
+        --border: #404040;
+
+        --accent: #fb923c;
+        --accent-hover: #fdba74;
+
+        --danger: #ff6b6b;
+    }
+}
+
 body {
     margin: 0;
     padding: 20px;
@@ -10,8 +44,8 @@ body {
         Arial,
         sans-serif;
 
-    color: #222;
-    background: #f5f5f5;
+    color: var(--text);
+    background: var(--background);
 }
 
 button {
@@ -21,8 +55,9 @@ button {
     border: none;
     border-radius: 6px;
 
-    background: #222;
-    color: white;
+    /*background: var(--button-background);*/
+    background: var(--accent);
+    color: var(--button-text);
 
     font-size: 14px;
     font-weight: 600;
@@ -31,7 +66,19 @@ button {
 }
 
 button:hover {
-    background: #444;
+    /*background: var(--button-hover);*/
+    background: var(--accent-hover);
+}
+
+.secondary-button {
+    background: var(--surface);
+    color: var(--text);
+
+    border: 1px solid var(--border);
+}
+
+.secondary-button:hover {
+    background: var(--background);
 }
 
 textarea {
@@ -39,8 +86,11 @@ textarea {
     box-sizing: border-box;
     padding: 10px;
 
-    border: 1px solid #ccc;
+    border: 1px solid var(--input-border);
     border-radius: 6px;
+
+    background: var(--input-background);
+    color: var(--input-text);
 }
 
 .popup {
@@ -53,6 +103,92 @@ textarea {
 }
 
 .error-message {
-    color: red;
+    color: var(--error);
     font-weight: bold;
+}
+
+.compose-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+
+    margin: 10px 0;
+}
+
+.compose-option input {
+    margin-top: 3px;
+}
+
+.compose-option strong,
+.compose-option small {
+    display: block;
+}
+
+.compose-option small {
+    margin-top: 2px;
+    color: var(--text-secondary);
+}
+
+.recommended-badge {
+    margin-left: 6px;
+    padding: 2px 5px;
+
+    border-radius: 4px;
+
+    color: var(--accent);
+    font-size: 11px;
+    font-weight: 600;
+}
+
+button:focus-visible,
+textarea:focus-visible,
+input:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+.card-header:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+#generateKeyPair {
+    margin-top: 16px;
+}
+
+.operation-status {
+    margin-top: 8px;
+    color: var(--text-secondary);
+    font-size: 13px;
+}
+
+.operation-status--success {
+    color: var(--accent);
+    /*color: var(--text);*/
+}
+.decrypted-output {
+    position: relative;
+}
+
+.decrypted-output textarea {
+    padding-right: 36px;
+}
+
+.copy-button {
+    width: auto;
+    padding: 4px 6px;
+
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+}
+
+.copy-button:hover {
+    background: transparent;
+    color: var(--accent);
+}
+
+.card-header:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: 4px;
 }

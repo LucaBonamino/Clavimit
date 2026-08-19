@@ -3,6 +3,21 @@ import { getReceivedEmailText, setEmailText, getInputEmailText, openComposeWindo
 import { parseMessage, composeMessage } from "./messageFormat.js";
 import { ClavimitError } from "./exeptions.js";
 
+function setStatus(element, message, success = false) {
+    element.textContent = message;
+    element.hidden = false;
+    element.classList.toggle("operation-status--success", success);
+}
+
+function clearStatus(element) {
+    element.textContent = "";
+    element.hidden = true;
+    element.classList.remove("operation-status--success");
+}
+
+const encryptStatus = document.getElementById("encryptStatus");
+const decryptStatus = document.getElementById("decryptStatus");
+const keyGenerationStatus = document.getElementById("keyGenerationStatus");
 
 const decryptError = document.getElementById("decryptError");
 
@@ -49,10 +64,6 @@ const senderPublicKeyInput = document.getElementById("senderPublicKey");
 const decryptButton = document.getElementById("dec");
 const decryptedText = document.getElementById("decryptedText");
 
-const privateKeyFile = document.getElementById("privateKeyFile");
-const publicKeyFile = document.getElementById("publicKeyFile");
-const senderPublicKeyFile = document.getElementById("senderPublicKeyFile");
-
 const encryptWithSenderKeyCheckBox = document.getElementById("encryptWithSenderPublicKey");
 
 // -------- Key generation
@@ -62,30 +73,35 @@ const generatedPublicKey = document.getElementById("generatedPublicKey");
 const generatedPrivateKey = document.getElementById("generatedPrivateKey");
 
 generateRsaKeyPairButton.addEventListener("click", async () => {
-    const keyPair = await generateKeyPair();
-    generatedPublicKey.value = keyPair.publicKey;
-    generatedPrivateKey.value = keyPair.privateKey;
+    clearStatus(keyGenerationStatus);
 
-    generatedKeys.hidden = false;
+    generateRsaKeyPairButton.disabled = true;
+    generateRsaKeyPairButton.textContent = "Generating key pair…";
+    try{
+        const keyPair = await generateKeyPair();
+        generatedPublicKey.value = keyPair.publicKey;
+        generatedPrivateKey.value = keyPair.privateKey;
+        document.getElementById("generatePublicKeyDiv").hidden = false;
+        document.getElementById("generatePrivateKeyDiv").hidden = false;
+        setStatus(keyGenerationStatus, "✓ Key pair generated", true );
+    } finally{
+        generateRsaKeyPairButton.disabled = false;
+        generateRsaKeyPairButton.textContent =  "Generate RSA key pair";
+    }
+        
 })
 
 
-document
-    .getElementById("downloadPublicKey")
-    .addEventListener("click", () => {
-        downloadPem(
-            "clavimit-public.pem",
-            generatedPublicKey.value
-        );
+document.getElementById("downloadPublicKey").addEventListener("click", () => {
+        downloadPem("clavimit-public.pem",generatedPublicKey.value);
+        generatedPublicKey.value = "";
+        document.getElementById("generatePublicKeyDiv").hidden = true;
     });
 
-document
-    .getElementById("downloadPrivateKey")
-    .addEventListener("click", () => {
-        downloadPem(
-            "clavimit-private.pem",
-            generatedPrivateKey.value
-        );
+document.getElementById("downloadPrivateKey").addEventListener("click", () => {
+        downloadPem("clavimit-private.pem",generatedPrivateKey.value);
+        generatedPrivateKey.value = "";
+        document.getElementById("generatePrivateKeyDiv").hidden = true;
     });
 // --------
 
@@ -109,13 +125,18 @@ encryptWithSenderKeyCheckBox.addEventListener("change", () => {
 })
 
 // Import RSA keys by file
+const privateKeyFile = document.getElementById("privateKeyFile");
+const publicKeyFile = document.getElementById("publicKeyFile");
+const senderPublicKeyFile = document.getElementById("senderPublicKeyFile");
+
 privateKeyFile.addEventListener("change", async () => {
     const file = privateKeyFile.files[0];
     if (!file) {
         return;
     }
     const text = await file.text();
-    document.getElementById("privateKey").value = text;
+    privateKeyInput.value = text;
+
 });
 
 publicKeyFile.addEventListener("change", async () => {
@@ -124,7 +145,7 @@ publicKeyFile.addEventListener("change", async () => {
         return;
     }
     const text = await file.text();
-    document.getElementById("publicKey").value = text;
+    publicKeyInput.value = await file.text();
 });
 
 senderPublicKeyFile.addEventListener("change", async () => {
@@ -133,13 +154,20 @@ senderPublicKeyFile.addEventListener("change", async () => {
         return;
     }
     const text = await file.text();
-    document.getElementById("senderPublicKey").value = text;
+    senderPublicKeyInput.value = await file.text();
 });
 //
 
 // Email decryption handler
+const copyDecryptedTextButton = document.getElementById("copyDecryptedText");
+
+copyDecryptedTextButton.addEventListener("click", async () => {
+    await navigator.clipboard.writeText(decryptedText.value);
+});
 decryptButton.addEventListener("click", async () => {
     clearDecryptError();
+    document.getElementById("decryptionResultArea").hidden = true;
+    clearStatus(decryptStatus);
     try {
         const privateKey = privateKeyInput.value.trim();
 
@@ -150,7 +178,10 @@ decryptButton.addEventListener("click", async () => {
         const message = parseMessage(text);
         const plaintext = await decryptMessage(message, privateKey);
         decryptedText.value = plaintext;
+        document.getElementById("decryptionResultArea").hidden = false;
         privateKeyInput.value = "";
+        privateKeyFile.value = "";
+        setStatus(decryptStatus, "✓ Message decrypted", true);
     } catch (error) {
         console.error("Decryption error:", error);
 
@@ -161,6 +192,9 @@ decryptButton.addEventListener("click", async () => {
                 "Something went wrong while decrypting the message."
             );
         }
+    } finally {
+        decryptButton.disabled = false;
+        decryptButton.textContent = "Decrypt Email";
     }
 
 });
@@ -168,6 +202,7 @@ decryptButton.addEventListener("click", async () => {
 // Email encryption handler
 button.addEventListener("click", async () => {
     clearEncryptError();
+    clearStatus(encryptStatus);
     try {
         const publicKey = publicKeyInput.value.trim();
         if (!publicKey) {
@@ -203,6 +238,7 @@ button.addEventListener("click", async () => {
         else {
             text = await getInputEmailText();
         }
+        setStatus(encryptStatus,"✓ Encrypted message inserted into Gmail",true);
 
 
         if (!text?.trim()) {
@@ -219,8 +255,10 @@ button.addEventListener("click", async () => {
         const message = composeMessage(enc);
         await setEmailText(message);
         publicKeyInput.value = "";
+        publicKeyFile.value = "";
         if (senderPublicKeyInput.value) {
             senderPublicKeyInput.value = "";
+            senderPublicKeyFile.value = "";
         }
 
     } catch (error) {
@@ -233,5 +271,8 @@ button.addEventListener("click", async () => {
                 "Something unexpected went wrong."
             );
         }
+    } finally {
+        button.disabled = false;
+        button.textContent = "Encrypt Email";
     }
 });
