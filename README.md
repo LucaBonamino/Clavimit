@@ -182,7 +182,6 @@ Future versions may improve usability around public keys and identity verificati
 
 The next planned improvements focus on extending the current email workflow and improving privacy:
 
-* **Secure compose mode** — allow users to write the plaintext message inside Clavimit so that only the encrypted content is inserted into Gmail.
 * **Attachment encryption** — encrypt email attachments together with the message content.
 * **Formatted decrypted messages** — correctly display decrypted HTML and structured message content instead of showing the raw representation.
 * **Symmetric encryption mode** — optionally allow encryption using a user-provided symmetric key for situations where both parties already share a secret.
