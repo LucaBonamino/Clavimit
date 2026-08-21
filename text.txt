@@ -1,0 +1,25 @@
+Clavimit is an open-source browser extension for encrypting and decrypting Gmail messages directly in your browser.
+It uses hybrid encryption: message content is encrypted with AES-256-GCM, while RSA-OAEP with SHA-256 is used to securely encrypt the message key for the recipient.
+
+With Clavimit, you can compose a message in the extension and encrypt it locally using the recipient's public key. Only the encrypted message is then inserted into Gmail.
+When you receive a Clavimit-encrypted message, the extension can detect it and decrypt it locally using your private key.
+
+Features:
+- Generate public and private encryption keys
+- Encrypt messages locally before inserting them into Gmail
+- Detect Clavimit-encrypted messages in Gmail
+- Decrypt messages locally using your private key
+- No plaintext message content is sent to a Clavimit server
+- Light and dark mode support
+- Open-source
+
+Clavimit encrypts the message content, not Gmail metadata. Information such as sender, recipient, subject, timestamps, and other metadata may still be processed by Gmail.
+
+Users remain in control of their keys. Clavimit does not upload keys to a server, synchronize them between devices, or store private keys in the browser.
+Users are responsible for storing, backing up, exchanging, and verifying their own RSA keys. Keys can be generated independently or generated locally using Clavimit.
+
+Keys are provided to Clavimit only when needed, either by pasting them into the extension or by selecting a key file.
+
+
+
+Clavimit is browser extension for encrypting and decrypting Gmail messages directly in your browser. Message content is encrypted before it is inserted into Gmail.

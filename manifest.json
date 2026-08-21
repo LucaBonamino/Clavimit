@@ -8,9 +8,6 @@
 		"sidePanel"
 	],
 	"manifest_version": 3,
-	"host_permissions": [
-    	"https://mail.google.com/*"
-  	],
 	"action": {
 		"default_title": "Open Clavimit",
 		"default_popup": "popup.html"
