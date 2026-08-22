@@ -13,6 +13,12 @@
     --accent-hover: #ea580c;
 
     --danger: #c62828;
+    --error: #c62828;
+
+    --button-text: #ffffff;
+    --input-background: var(--surface);
+    --input-text: var(--text);
+    --input-border: var(--border);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -27,8 +33,14 @@
 
         --accent: #fb923c;
         --accent-hover: #fdba74;
-
+        
         --danger: #ff6b6b;
+        --error: #ff6b6b;
+
+        --button-text: #ffffff;
+        --input-background: var(--surface);
+        --input-text: var(--text);
+        --input-border: var(--border);
     }
 }
 
