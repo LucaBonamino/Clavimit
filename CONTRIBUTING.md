@@ -2,7 +2,7 @@
 
 Thank you for your interest in contributing to Clavimit.
 
-Clavimit is still in early development, and contributions such as bug reports, documentation improvements, testing, feature proposals, and code changes are welcome.
+Clavimit is under active development, and contributions such as bug reports, documentation improvements, testing, feature proposals, and code changes are welcome.
 
 ## Before contributing
 
@@ -18,17 +18,20 @@ For larger features, cryptographic changes, or architectural changes, please ope
 ```bash
 git clone https://github.com/YOUR_USERNAME/Clavimit.git
 ```
-
-3. Open Chrome and navigate to:
+3. Switch to the `develop` branch
+```bash
+git checkout develop
+```
+4. Open Chrome and navigate to:
 
 ```text
 chrome://extensions
 ```
 
-4. Enable **Developer mode**.
-5. Click **Load unpacked**.
-6. Select the Clavimit project directory.
-7. Open Gmail and test the extension.
+5. Enable **Developer mode**.
+6. Click **Load unpacked**.
+7. Select the Clavimit project directory.
+8. Open Gmail and test the extension.
 
 After making changes, reload the extension from `chrome://extensions` before testing again.
 
@@ -78,6 +81,8 @@ Documentation issues may concern the README, Privacy Policy, contributing guide,
 ## Pull requests
 
 Pull requests are welcome.
+
+Pull requests should target the `develop` branch. The `main` branch is reserved for stable releases.
 
 Please use the provided pull request template and keep each pull request focused on a single issue, feature, or improvement whenever possible.
 

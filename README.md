@@ -9,6 +9,24 @@ It uses hybrid encryption with **AES-256-GCM** and **RSA-OAEP with SHA-256**. En
 
 Clavimit does not require an account or a Clavimit server.
 
+## Installation
+Clavimit is available on the Chrome Web Store. [Install Clavimit from the Chrome Web Store](https://chromewebstore.google.com/detail/clavimit/iicgeaiojengjpccnjcchkkokiagkihd)
+
+### Development version
+To install the development version manually:
+1. Clone or download this repository.
+2. Check out the develop branch: 
+```bash 
+git checkout develop
+```
+3. Open Chrome.
+4. Navigate to `chrome://extensions`. 
+5. Enable **Developer mode**.
+6. Click **Load unpacked**.
+7. Select the Clavimit project directory.
+8. Open Gmail.
+9. Open Clavimit from Chrome and use the side panel to encrypt or decrypt messages.
+
 ## How it works
 
 ### Encrypting
@@ -138,21 +156,6 @@ Clavimit also does not currently provide:
 * protection against plaintext drafts created by Gmail before encryption
 
 Users should independently verify that a public key really belongs to the intended recipient before using it.
-
-## Installation
-
-Clavimit is currently distributed as a development version.
-
-To install it manually:
-
-1. Clone or download this repository.
-2. Open Chrome.
-3. Navigate to `chrome://extensions`.
-4. Enable **Developer mode**.
-5. Click **Load unpacked**.
-6. Select the Clavimit project directory.
-7. Open Gmail.
-8. Open Clavimit from Chrome and use the side panel to encrypt or decrypt messages.
 
 ## Current status
 
