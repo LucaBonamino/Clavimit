@@ -1,4 +1,7 @@
-# Clavimit
+<h1>
+  <img src="icons/icon128.png" width="48" align="center" alt="Clavimit icon">
+  Clavimit
+</h1>
 
 Clavimit is a Chrome extension for encrypting and decrypting Gmail messages using client-side cryptography.
 
