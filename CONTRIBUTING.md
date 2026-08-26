@@ -102,10 +102,8 @@ Changes affecting cryptography, message parsing, Gmail access, or key handling s
 
 Some areas currently planned for development include:
 
-* **Secure compose mode** — allow users to write plaintext inside Clavimit so that Gmail receives only encrypted content.
 * **Attachment encryption** — support encryption and decryption of email attachments.
 * **Formatted decrypted messages** — correctly render decrypted HTML and structured message content.
-* **Sent-message decryption** — allow senders to decrypt messages they previously encrypted.
 * **Symmetric encryption mode** — support encryption using user-provided symmetric keys.
 * **Improved Gmail integration** — make message and compose-window detection more robust.
 * **Automated tests** — expand coverage for cryptographic operations, message formatting, invalid input, and edge cases.
