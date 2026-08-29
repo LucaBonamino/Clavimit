@@ -5,8 +5,8 @@
 // in content.js to display user-facing error messages.
 
 export class ClavimitError extends Error {
-  constructor(code, message) {
-    super(message);
-    this.code = code;
-  }
+    constructor(code, message) {
+        super(message);
+        this.code = code;
+    }
 }
