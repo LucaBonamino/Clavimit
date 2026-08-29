@@ -8,6 +8,9 @@
     "format": "prettier . --write",
     "format-check": "prettier . --check"
   },
+   "imports": {
+    "#src/*": "./src/*"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/LucaBonamino/Clavimit.git"

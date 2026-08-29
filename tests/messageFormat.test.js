@@ -4,7 +4,7 @@ import {
     parseMessage,
     deserializeMessage,
     validateMessage,
-} from "../scripts/messageFormat.js";
+} from "#src/scripts/messageFormat.js";
 
 import {
     MESSAGE_BEGIN,
@@ -12,7 +12,7 @@ import {
     PAYLOAD_VERSION,
     ALGORITHM,
     KEY_ALGORITHM,
-} from "../scripts/config.js";
+} from "#src/scripts/config.js";
 
 const validMessage = {
     version: PAYLOAD_VERSION,

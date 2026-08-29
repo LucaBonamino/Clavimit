@@ -4,7 +4,7 @@ import {
     decryptMessage,
     importPublicKey,
     importPrivateKey,
-} from "../scripts/cryptography";
+} from "#src/scripts/cryptography";
 
 async function generateKeyPair() {
     const { publicKey, privateKey } = await crypto.subtle.generateKey(
