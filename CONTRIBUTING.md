@@ -158,7 +158,15 @@ Documentation-only changes do not require Gmail testing.
 
 Try to follow the style already used throughout the project.
 
-In particular:
+Before submitting a pull request, format the project with:
+
+```bash
+npm run format
+```
+
+Formatting is also checked automatically by CI.
+
+In addition:
 
 * use clear function and variable names
 * keep functions focused on a single responsibility

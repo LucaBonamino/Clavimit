@@ -1,6 +1,10 @@
 import { describe, it, expect } from "vitest";
-import { encryptMessage, decryptMessage, importPublicKey, importPrivateKey } from "../scripts/cryptography";
-
+import {
+    encryptMessage,
+    decryptMessage,
+    importPublicKey,
+    importPrivateKey,
+} from "../scripts/cryptography";
 
 async function generateKeyPair() {
     const { publicKey, privateKey } = await crypto.subtle.generateKey(
@@ -8,25 +12,19 @@ async function generateKeyPair() {
             name: "RSA-OAEP",
             modulusLength: 4096,
             publicExponent: new Uint8Array([1, 0, 1]),
-            hash: "SHA-256"
+            hash: "SHA-256",
         },
         true,
-        ["encrypt", "decrypt"]
+        ["encrypt", "decrypt"],
     );
 
-    const publicKeyBuffer = await crypto.subtle.exportKey(
-        "spki",
-        publicKey
-    );
+    const publicKeyBuffer = await crypto.subtle.exportKey("spki", publicKey);
 
-    const privateKeyBuffer = await crypto.subtle.exportKey(
-        "pkcs8",
-        privateKey
-    );
+    const privateKeyBuffer = await crypto.subtle.exportKey("pkcs8", privateKey);
 
     return {
         publicKey: toPem(publicKeyBuffer, "PUBLIC KEY"),
-        privateKey: toPem(privateKeyBuffer, "PRIVATE KEY")
+        privateKey: toPem(privateKeyBuffer, "PRIVATE KEY"),
     };
 }
 
@@ -44,46 +42,30 @@ function toPem(buffer, label) {
     return `-----BEGIN ${label}-----\n${lines}\n-----END ${label}-----`;
 }
 
-
 describe("encryption and decryption", () => {
-
     it("encrypts and decrypts a message with the recipient key", async () => {
         const { publicKey, privateKey } = await generateKeyPair();
 
         const message = "This is a dummy message";
 
-        const encrypted = await encryptMessage(
-            message,
-            publicKey
-        );
+        const encrypted = await encryptMessage(message, publicKey);
 
-        const decrypted = await decryptMessage(
-            encrypted,
-            privateKey
-        );
+        const decrypted = await decryptMessage(encrypted, privateKey);
 
         expect(decrypted).toBe(message);
     });
-
 
     it("encrypts and decrypts an empty message", async () => {
         const { publicKey, privateKey } = await generateKeyPair();
 
         const message = "";
 
-        const encrypted = await encryptMessage(
-            message,
-            publicKey
-        );
+        const encrypted = await encryptMessage(message, publicKey);
 
-        const decrypted = await decryptMessage(
-            encrypted,
-            privateKey
-        );
+        const decrypted = await decryptMessage(encrypted, privateKey);
 
         expect(decrypted).toBe(message);
     });
-
 
     it("allows the sender to decrypt with the sender private key", async () => {
         const recipient = await generateKeyPair();
@@ -94,17 +76,13 @@ describe("encryption and decryption", () => {
         const encrypted = await encryptMessage(
             message,
             recipient.publicKey,
-            sender.publicKey
+            sender.publicKey,
         );
 
-        const decrypted = await decryptMessage(
-            encrypted,
-            sender.privateKey
-        );
+        const decrypted = await decryptMessage(encrypted, sender.privateKey);
 
         expect(decrypted).toBe(message);
     });
-
 
     it("allows the recipient to decrypt when a sender copy exists", async () => {
         const recipient = await generateKeyPair();
@@ -115,35 +93,29 @@ describe("encryption and decryption", () => {
         const encrypted = await encryptMessage(
             message,
             recipient.publicKey,
-            sender.publicKey
+            sender.publicKey,
         );
 
-        const decrypted = await decryptMessage(
-            encrypted,
-            recipient.privateKey
-        );
+        const decrypted = await decryptMessage(encrypted, recipient.privateKey);
 
         expect(decrypted).toBe(message);
     });
 
-
     it("throws INVALID_RECIPIENT_PUBLIC_KEY when recipient key is empty", async () => {
-        await expect(
-            encryptMessage("dummy message", "")
-        ).rejects.toMatchObject({
-            code: "INVALID_RECIPIENT_PUBLIC_KEY"
-        });
+        await expect(encryptMessage("dummy message", "")).rejects.toMatchObject(
+            {
+                code: "INVALID_RECIPIENT_PUBLIC_KEY",
+            },
+        );
     });
-
 
     it("throws INVALID_RECIPIENT_PUBLIC_KEY when recipient key is invalid", async () => {
         await expect(
-            encryptMessage("dummy message", "dummy key")
+            encryptMessage("dummy message", "dummy key"),
         ).rejects.toMatchObject({
-            code: "INVALID_RECIPIENT_PUBLIC_KEY"
+            code: "INVALID_RECIPIENT_PUBLIC_KEY",
         });
     });
-
 
     it("throws INVALID_SENDER_PUBLIC_KEY when sender key is invalid", async () => {
         const recipient = await generateKeyPair();
@@ -152,29 +124,25 @@ describe("encryption and decryption", () => {
             encryptMessage(
                 "dummy message",
                 recipient.publicKey,
-                "dummy sender key"
-            )
+                "dummy sender key",
+            ),
         ).rejects.toMatchObject({
-            code: "INVALID_SENDER_PUBLIC_KEY"
+            code: "INVALID_SENDER_PUBLIC_KEY",
         });
     });
-
 
     it("does not create a sender key when none is provided", async () => {
         const recipient = await generateKeyPair();
 
         const encrypted = await encryptMessage(
             "dummy message",
-            recipient.publicKey
+            recipient.publicKey,
         );
 
-        expect(encrypted.encryptedKeys.recipient)
-            .toBeTypeOf("string");
+        expect(encrypted.encryptedKeys.recipient).toBeTypeOf("string");
 
-        expect(encrypted.encryptedKeys.sender)
-            .toBeNull();
+        expect(encrypted.encryptedKeys.sender).toBeNull();
     });
-
 
     it("creates both encrypted key copies when sender key is provided", async () => {
         const recipient = await generateKeyPair();
@@ -183,14 +151,12 @@ describe("encryption and decryption", () => {
         const encrypted = await encryptMessage(
             "dummy message",
             recipient.publicKey,
-            sender.publicKey
+            sender.publicKey,
         );
 
-        expect(encrypted.encryptedKeys.recipient)
-            .toBeTypeOf("string");
+        expect(encrypted.encryptedKeys.recipient).toBeTypeOf("string");
 
-        expect(encrypted.encryptedKeys.sender)
-            .toBeTypeOf("string");
+        expect(encrypted.encryptedKeys.sender).toBeTypeOf("string");
     });
 
     it("rejects a private key that belongs to neither sender nor recipient", async () => {
@@ -201,16 +167,13 @@ describe("encryption and decryption", () => {
         const encrypted = await encryptMessage(
             "secret message",
             recipient.publicKey,
-            sender.publicKey
+            sender.publicKey,
         );
 
         await expect(
-            decryptMessage(
-                encrypted,
-                stranger.privateKey
-            )
+            decryptMessage(encrypted, stranger.privateKey),
         ).rejects.toMatchObject({
-            code: "DECRYPTION_FAILED"
+            code: "DECRYPTION_FAILED",
         });
     });
 });
