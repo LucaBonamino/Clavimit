@@ -1,5 +1,5 @@
 <h1>
-  <img src="icons/icon128.png" width="48" align="center" alt="Clavimit icon">
+  <img src="src/icons/icon128.png" width="48" align="center" alt="Clavimit icon">
   Clavimit
 </h1>
 
