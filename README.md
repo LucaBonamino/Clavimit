@@ -1,5 +1,5 @@
 <h1>
-  <img src="icons/icon128.png" width="48" align="center" alt="Clavimit icon">
+  <img src="src/icons/icon128.png" width="48" align="center" alt="Clavimit icon">
   Clavimit
 </h1>
 
@@ -23,7 +23,7 @@ git checkout develop
 4. Navigate to `chrome://extensions`. 
 5. Enable **Developer mode**.
 6. Click **Load unpacked**.
-7. Select the Clavimit project directory.
+7. Select the `src` directory inside the Clavimit project directory.
 8. Open Gmail.
 9. Open Clavimit from Chrome and use the side panel to encrypt or decrypt messages.
 
