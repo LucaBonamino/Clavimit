@@ -30,7 +30,7 @@ chrome://extensions
 
 5. Enable **Developer mode**.
 6. Click **Load unpacked**.
-7. Select the Clavimit project directory.
+7. Select the `src` directory inside the Clavimit project directory.
 8. Open Gmail and test the extension.
 
 After making changes, reload the extension from `chrome://extensions` before testing again.
