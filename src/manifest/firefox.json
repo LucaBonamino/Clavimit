@@ -1,0 +1,20 @@
+{
+    "permissions": [
+        "activeTab",
+        "scripting"
+    ],
+    "sidebar_action": {
+        "default_title": "Clavimit",
+        "default_panel": "index.html"
+    },
+    "browser_specific_settings": {
+        "gecko": {
+            "id": "clavimit@clavimit.org",
+            "data_collection_permissions": {
+                "required": [
+                    "none"
+                ]
+            }
+        }
+    }
+}

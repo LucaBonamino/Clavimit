@@ -6,7 +6,9 @@
   "scripts": {
     "test": "vitest run",
     "format": "prettier . --write",
-    "format-check": "prettier . --check"
+    "format:check": "prettier . --check",
+    "build:chrome": "node build/build.js -b chrome",
+    "build:firefox": "node build/build.js -b firefox"
   },
    "imports": {
     "#src/*": "./src/*"
