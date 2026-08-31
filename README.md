@@ -3,14 +3,19 @@
   Clavimit
 </h1>
 
-Clavimit is a Chrome extension for encrypting and decrypting Gmail messages using client-side cryptography.
+Clavimit is a browser extension for encrypting and decrypting Gmail messages using client-side cryptography.
 
 It uses hybrid encryption with **AES-256-GCM** and **RSA-OAEP with SHA-256**. Encryption and decryption are performed locally in the browser using the Web Crypto API.
 
 Clavimit does not require an account or a Clavimit server.
 
 ## Installation
+
+### Google Chrome
 Clavimit is available on the Chrome Web Store. [Install Clavimit from the Chrome Web Store](https://chromewebstore.google.com/detail/clavimit/iicgeaiojengjpccnjcchkkokiagkihd)
+
+### Mozilla Firefox
+Firefox support is available from the same Clavimit codebase.
 
 ### Development version
 To install the development version manually:
@@ -19,21 +24,52 @@ To install the development version manually:
 ```bash 
 git checkout develop
 ```
-3. Open Chrome.
-4. Navigate to `chrome://extensions`. 
-5. Enable **Developer mode**.
-6. Click **Load unpacked**.
-7. Select the `src` directory inside the Clavimit project directory.
-8. Open Gmail.
-9. Open Clavimit from Chrome and use the side panel to encrypt or decrypt messages.
+3. Install teh project dependencies: 
+```bash
+npm install
+```
+
+#### Build for Chrome
+Run
+```bash
+npm run build:chrome
+```
+The generated Chrome extension is written to: `dist/chrome`
+
+To load it manually:
+1. Open Chrome.
+2. Navigate to `chrome://extensions`. 
+3. Enable **Developer mode**.
+4. Click **Load unpacked**.
+5. Select the `dist/chrome` directory.
+6. Open Gmail.
+7. Open Clavimit from Chrome and use the side panel to encrypt or decrypt messages.
+
+#### Build for Firefox
+Run
+```bash
+npm run build:firefox
+```
+The generated Chrome extension is written to: `dist/firefox`
+
+To load it manually:
+1. Open Firefox.
+2. Navigate to `about:debugging`. 
+3. Select **This Firefox**.
+4. Click **Load Temporary Add-on**.
+5.Select the `dist/firefox` directory.
+6. Open Gmail.
+7. Open Clavimit from Chrome and use the side panel to encrypt or decrypt messages.
+
+Extensions loaded through `about:debugging` are temporary and must be loaded again after restarting Firefox.
 
 ## How it works
 
 ### Encrypting
 When encrypting a message:
 
-1. Write an email in Gmail.
-2. Open Clavimit.
+1. Open Clavimit.
+2. Open the encryption section.
 3. Provide the recipient's RSA public key by:
    * pasting the key, or
    * selecting a public-key file.

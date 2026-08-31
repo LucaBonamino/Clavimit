@@ -1,8 +1,8 @@
 # Clavimit Privacy Policy
 
-**Last updated: August 18, 2026**
+**Last updated: August 31, 2026**
 
-Clavimit is a Chrome extension for encrypting and decrypting Gmail messages locally in the user's browser.
+Clavimit is a browser extension for encrypting and decrypting Gmail messages locally in the user's browser.
 
 Clavimit is designed so that email content and cryptographic keys used by the extension are processed locally and are not sent to a Clavimit server.
 
