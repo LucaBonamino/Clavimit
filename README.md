@@ -15,53 +15,7 @@ Clavimit does not require an account or a Clavimit server.
 Clavimit is available on the Chrome Web Store. [Install Clavimit from the Chrome Web Store](https://chromewebstore.google.com/detail/clavimit/iicgeaiojengjpccnjcchkkokiagkihd)
 
 ### Mozilla Firefox
-Firefox support is available from the same Clavimit codebase.
-
-### Development version
-To install the development version manually:
-1. Clone or download this repository.
-2. Check out the develop branch: 
-```bash 
-git checkout develop
-```
-3. Install teh project dependencies: 
-```bash
-npm install
-```
-
-#### Build for Chrome
-Run
-```bash
-npm run build:chrome
-```
-The generated Chrome extension is written to: `dist/chrome`
-
-To load it manually:
-1. Open Chrome.
-2. Navigate to `chrome://extensions`. 
-3. Enable **Developer mode**.
-4. Click **Load unpacked**.
-5. Select the `dist/chrome` directory.
-6. Open Gmail.
-7. Open Clavimit from Chrome and use the side panel to encrypt or decrypt messages.
-
-#### Build for Firefox
-Run
-```bash
-npm run build:firefox
-```
-The generated Chrome extension is written to: `dist/firefox`
-
-To load it manually:
-1. Open Firefox.
-2. Navigate to `about:debugging`. 
-3. Select **This Firefox**.
-4. Click **Load Temporary Add-on**.
-5.Select the `dist/firefox` directory.
-6. Open Gmail.
-7. Open Clavimit from Chrome and use the side panel to encrypt or decrypt messages.
-
-Extensions loaded through `about:debugging` are temporary and must be loaded again after restarting Firefox.
+Clavimit is available on the Firefox Add-Ons. [Install Clavimit from Firefox Add-Ons](https://addons.mozilla.org/en-US/firefox/addon/clavimit/)
 
 ## How it works
 
@@ -244,6 +198,54 @@ Clavimit will continue to leave key ownership, distribution, and identity verifi
 Contributions are welcome.
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup, contribution guidelines, issue reporting, and current areas for contribution.
+
+## Install Development version
+To install the development version manually:
+1. Clone or download this repository.
+2. Check out the develop branch: 
+```bash 
+git checkout develop
+```
+3. Install teh project dependencies: 
+```bash
+npm install
+```
+
+#### Build for Chrome
+Run
+```bash
+npm run build:chrome
+```
+The generated Chrome extension is written to: `dist/chrome`
+
+To load it manually:
+1. Open Chrome.
+2. Navigate to `chrome://extensions`. 
+3. Enable **Developer mode**.
+4. Click **Load unpacked**.
+5. Select the `dist/chrome` directory.
+6. Open Gmail.
+7. Open Clavimit from Chrome and use the side panel to encrypt or decrypt messages.
+
+#### Build for Firefox
+Run
+```bash
+npm run build:firefox
+```
+The generated Chrome extension is written to: `dist/firefox`
+
+To load it manually:
+1. Open Firefox.
+2. Navigate to `about:debugging`. 
+3. Select **This Firefox**.
+4. Click **Load Temporary Add-on**.
+5.Select the `dist/firefox` directory.
+6. Open Gmail.
+7. Open Clavimit from Chrome and use the side panel to encrypt or decrypt messages.
+
+Extensions loaded through `about:debugging` are temporary and must be loaded again after restarting Firefox.
+
+
 
 ## License
 
