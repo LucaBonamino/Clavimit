@@ -252,3 +252,4 @@ Extensions loaded through `about:debugging` are temporary and must be loaded aga
 Clavimit is licensed under the **GNU General Public License v3.0**.
 
 See the [LICENSE](LICENSE) file for details.
+# Clavidoc
