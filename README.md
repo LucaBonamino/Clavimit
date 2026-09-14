@@ -9,6 +9,33 @@ It uses hybrid encryption with **AES-256-GCM** and **RSA-OAEP with SHA-256**. En
 
 Clavimit does not require an account or a Clavimit server.
 
+## Screenshots
+
+<p align="center">
+  <img src="images/clavimitInit.png" alt="Clavimit initial view" width="23%" />
+  <img src="images/ClavimitEncrpt.png" alt="Clavimit encryption view" width="23%" />
+  <img src="images/ClavimitDecrypt.png" alt="Clavimit decryption view" width="23%" />
+  <img src="images/ClavimitKeyGeneration.png" alt="Clavimit key generation view" width="23%" />
+</p>
+
+<p aligh="center"> 
+   <img src="images/encryptingEmail.png" alt="Clavimit encrypting email view" width="100%">
+</p>
+
+
+
+
+
+## Features
+* 🔐 Encrypt Gmail messages
+* 🔓 Decrypt Clavimit messages directly from Gmail
+* ✍️ Secure compose mode keeps plaintext out of Gmail's compose field
+* 👤 Optional sender-side decryption for messages in Sent
+* 🔑 Use your own RSA keys or generate a key pair locally
+* 🌐 Available for Chrome and Firefox
+* 🚫 No Clavimit account or backend required
+* 🧩 Built using the browser-native Web Crypto API
+
 ## Installation
 
 ### Google Chrome
@@ -16,6 +43,35 @@ Clavimit is available on the Chrome Web Store. [Install Clavimit from the Chrome
 
 ### Mozilla Firefox
 Clavimit is available on the Firefox Add-Ons. [Install Clavimit from Firefox Add-Ons](https://addons.mozilla.org/en-US/firefox/addon/clavimit/)
+
+## 🤝 Contributing
+
+Contributors are welcome — including first-time open-source contributors.
+
+Clavimit is a small project that touches several interesting areas:
+* browser extension development
+* JavaScript
+* Gmail/DOM integration
+* Web Crypto
+* testing
+* privacy and security
+* UI/UX
+
+UI improvements, tests, documentation, validation, browser compatibility, and Gmail integration are all valuable areas to work on.
+
+### Good first contributions
+
+If this is your first contribution, these are good places to start:
+
+* [#3 — Clear key inputs after failed decryption](https://github.com/LucaBonamino/Clavimit/issues/3)
+* [#1 — Keep package and manifest versions synchronized](https://github.com/LucaBonamino/Clavimit/issues/1)
+* [See all good first issues](https://github.com/LucaBonamino/Clavimit/issues)
+
+For larger tasks, see the open issues.
+
+Read `CONTRIBUTING.md` for development setup, testing, contribution guidelines, and pull-request instructions.
+
+If you're unsure whether an issue is suitable for you, leave a comment on it. I'm happy to point you toward the relevant parts of the codebase.
 
 ## How it works
 

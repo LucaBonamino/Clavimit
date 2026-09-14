@@ -14,26 +14,52 @@ For larger features, cryptographic changes, or architectural changes, please ope
 
 1. Fork the repository.
 2. Clone your fork:
-
 ```bash
 git clone https://github.com/YOUR_USERNAME/Clavimit.git
 ```
-3. Switch to the `develop` branch
-```bash
+3. Check out the develop branch: 
+```bash 
 git checkout develop
 ```
-4. Open Chrome and navigate to:
-
-```text
-chrome://extensions
+4. Install teh project dependencies: 
+```bash
+npm install
 ```
 
-5. Enable **Developer mode**.
-6. Click **Load unpacked**.
-7. Select the `src` directory inside the Clavimit project directory.
-8. Open Gmail and test the extension.
+#### Build for Chrome
+Run
+```bash
+npm run build:chrome
+```
+The generated Chrome extension is written to: `dist/chrome`
 
-After making changes, reload the extension from `chrome://extensions` before testing again.
+To load it manually:
+1. Open Chrome.
+2. Navigate to `chrome://extensions`. 
+3. Enable **Developer mode**.
+4. Click **Load unpacked**.
+5. Select the `dist/chrome` directory.
+6. Open Gmail.
+7. Open Clavimit from Chrome and use the side panel to encrypt or decrypt messages.
+
+#### Build for Firefox
+Run
+```bash
+npm run build:firefox
+```
+The generated Chrome extension is written to: `dist/firefox`
+
+To load it manually:
+1. Open Firefox.
+2. Navigate to `about:debugging`. 
+3. Select **This Firefox**.
+4. Click **Load Temporary Add-on**.
+5.Select the `dist/firefox` directory.
+6. Open Gmail.
+7. Open Clavimit from Chrome and use the side panel to encrypt or decrypt messages.
+
+Extensions loaded through `about:debugging` are temporary and must be loaded again after restarting Firefox.
+
 
 ## Reporting issues
 
