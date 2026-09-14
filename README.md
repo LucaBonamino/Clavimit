@@ -262,7 +262,7 @@ To install the development version manually:
 ```bash 
 git checkout develop
 ```
-3. Install teh project dependencies: 
+3. Install the project dependencies: 
 ```bash
 npm install
 ```
@@ -288,7 +288,7 @@ Run
 ```bash
 npm run build:firefox
 ```
-The generated Chrome extension is written to: `dist/firefox`
+The generated Firefox extension is written to: `dist/firefox`
 
 To load it manually:
 1. Open Firefox.
