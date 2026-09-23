@@ -37,17 +37,19 @@ function toPem(buffer, label) {
 }
 
 describe("encryption and decryption", () => {
-    it("rejects a recipient public key with an RSA modulus smaller than 2048 bits", async () => {
-        const { publicKey } = await generateKeyPair(1024);
+    it("rejects a recipient RSA key smaller than 2048 bits", async () => {
+        const weakKey = await generateKeyPair(1024);
 
         await expect(
-            encryptMessage("dummy message", publicKey),
+            encryptMessage("dummy message", weakKey.publicKey),
         ).rejects.toMatchObject({
             code: "INVALID_RECIPIENT_PUBLIC_KEY",
+            message:
+                "The recipient's public key is not supported. RSA key must be at least 2048 bits.",
         });
     });
 
-    it("rejects a private key with an RSA modulus smaller than 2048 bits", async () => {
+    it("rejects a private RSA key smaller than 2048 bits", async () => {
         const recipient = await generateKeyPair();
         const weakKeyPair = await generateKeyPair(1024);
 
@@ -59,7 +61,8 @@ describe("encryption and decryption", () => {
         await expect(
             decryptMessage(encrypted, weakKeyPair.privateKey),
         ).rejects.toMatchObject({
-            code: "INVALID_PRIVATE_KEY",
+            code: "UNSUPPORTED_RSA_KEY",
+            message: "RSA key must be at least 2048 bits.",
         });
     });
 

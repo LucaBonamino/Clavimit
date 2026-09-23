@@ -16,7 +16,8 @@ const encoder = new TextEncoder();
 function validateRsaKey(key) {
     const { modulusLength, publicExponent } = key.algorithm;
     if (modulusLength < MIN_RSA_MODULUS_LENGTH) {
-        throw new Error(
+        throw new ClavimitError(
+            "UNSUPPORTED_RSA_KEY",
             `RSA key must be at least ${MIN_RSA_MODULUS_LENGTH} bits.`,
         );
     }
@@ -26,7 +27,10 @@ function validateRsaKey(key) {
             (value, index) => value === RSA_PUBLIC_EXPONENT[index],
         )
     ) {
-        throw new Error("Unsupported RSA public exponent.");
+        throw new ClavimitError(
+            "UNSUPPORTED_RSA_KEY",
+            "Unsupported RSA public exponent.",
+        );
     }
 }
 
@@ -74,7 +78,14 @@ export async function encryptMessage(text, publicKeyPem, senderPublicKeyPem) {
     let recipientRsaKey;
     try {
         recipientRsaKey = await importPublicKey(publicKeyPem);
-    } catch {
+    } catch(error) {
+        if (error.code === "UNSUPPORTED_RSA_KEY") {
+            throw new ClavimitError(
+                "INVALID_RECIPIENT_PUBLIC_KEY",
+                `The recipient's public key is not supported. ${error.message}`,
+            );
+        }
+
         throw new ClavimitError(
             "INVALID_RECIPIENT_PUBLIC_KEY",
             "The recipient's public key could not be read.",
@@ -89,7 +100,14 @@ export async function encryptMessage(text, publicKeyPem, senderPublicKeyPem) {
         let senderRsaKey;
         try {
             senderRsaKey = await importPublicKey(senderPublicKeyPem);
-        } catch {
+        } catch (error){
+            if (error.code === "UNSUPPORTED_RSA_KEY") {
+                throw new ClavimitError(
+                    "INVALID_SENDER_PUBLIC_KEY",
+                    `The sender's public key is not supported. ${error.message}`,
+                );
+            }
+
             throw new ClavimitError(
                 "INVALID_SENDER_PUBLIC_KEY",
                 "The sender's public key could not be read.",
@@ -156,6 +174,10 @@ export async function importPublicKey(pem) {
     } catch (error) {
         console.error("Public key import failed:", error);
 
+        if (error instanceof ClavimitError) {
+            throw error;
+        }
+
         throw new ClavimitError(
             "INVALID_PUBLIC_KEY",
             "The public key could not be read.",
@@ -198,6 +220,9 @@ export async function importPrivateKey(pem) {
         validateRsaKey(privateKey);
         return privateKey;
     } catch (error) {
+        if (error instanceof ClavimitError) {
+            throw error;
+        }
         throw new ClavimitError(
             "INVALID_PRIVATE_KEY",
             "The private key could not be read.",
