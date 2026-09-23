@@ -1,16 +1,11 @@
 import { describe, it, expect } from "vitest";
-import {
-    encryptMessage,
-    decryptMessage,
-    importPublicKey,
-    importPrivateKey,
-} from "#src/scripts/cryptography";
+import { encryptMessage, decryptMessage } from "#src/scripts/cryptography";
 
-async function generateKeyPair() {
+async function generateKeyPair(modulusLength = 4096) {
     const { publicKey, privateKey } = await crypto.subtle.generateKey(
         {
             name: "RSA-OAEP",
-            modulusLength: 4096,
+            modulusLength,
             publicExponent: new Uint8Array([1, 0, 1]),
             hash: "SHA-256",
         },
@@ -19,7 +14,6 @@ async function generateKeyPair() {
     );
 
     const publicKeyBuffer = await crypto.subtle.exportKey("spki", publicKey);
-
     const privateKeyBuffer = await crypto.subtle.exportKey("pkcs8", privateKey);
 
     return {
@@ -43,6 +37,32 @@ function toPem(buffer, label) {
 }
 
 describe("encryption and decryption", () => {
+    it("rejects a recipient public key with an RSA modulus smaller than 2048 bits", async () => {
+        const { publicKey } = await generateKeyPair(1024);
+
+        await expect(
+            encryptMessage("dummy message", publicKey),
+        ).rejects.toMatchObject({
+            code: "INVALID_RECIPIENT_PUBLIC_KEY",
+        });
+    });
+
+    it("rejects a private key with an RSA modulus smaller than 2048 bits", async () => {
+        const recipient = await generateKeyPair();
+        const weakKeyPair = await generateKeyPair(1024);
+
+        const encrypted = await encryptMessage(
+            "dummy message",
+            recipient.publicKey,
+        );
+
+        await expect(
+            decryptMessage(encrypted, weakKeyPair.privateKey),
+        ).rejects.toMatchObject({
+            code: "INVALID_PRIVATE_KEY",
+        });
+    });
+
     it("encrypts and decrypts a message with the recipient key", async () => {
         const { publicKey, privateKey } = await generateKeyPair();
 

@@ -7,7 +7,28 @@
 
 import { ClavimitError } from "./exeptions.js";
 
+const MIN_RSA_MODULUS_LENGTH = 2048;
+const GENERATED_RSA_MODULUS_LENGTH = 4096;
+const RSA_PUBLIC_EXPONENT = new Uint8Array([0x01, 0x00, 0x01]);
+
 const encoder = new TextEncoder();
+
+function validateRsaKey(key) {
+    const { modulusLength, publicExponent } = key.algorithm;
+    if (modulusLength < MIN_RSA_MODULUS_LENGTH) {
+        throw new Error(
+            `RSA key must be at least ${MIN_RSA_MODULUS_LENGTH} bits.`,
+        );
+    }
+    if (
+        publicExponent.length !== RSA_PUBLIC_EXPONENT.length ||
+        !publicExponent.every(
+            (value, index) => value === RSA_PUBLIC_EXPONENT[index],
+        )
+    ) {
+        throw new Error("Unsupported RSA public exponent.");
+    }
+}
 
 export async function encrypt(text, key) {
     const data = encoder.encode(text);
@@ -120,7 +141,7 @@ export async function importPublicKey(pem) {
 
         const bytes = Uint8Array.from(binary, (char) => char.charCodeAt(0));
 
-        return await crypto.subtle.importKey(
+        const publicKey = await crypto.subtle.importKey(
             "spki",
             bytes.buffer,
             {
@@ -130,6 +151,8 @@ export async function importPublicKey(pem) {
             false,
             ["encrypt"],
         );
+        validateRsaKey(publicKey);
+        return publicKey;
     } catch (error) {
         console.error("Public key import failed:", error);
 
@@ -162,7 +185,7 @@ export async function importPrivateKey(pem) {
             bytes[i] = binary.charCodeAt(i);
         }
 
-        return await crypto.subtle.importKey(
+        const privateKey = await crypto.subtle.importKey(
             "pkcs8",
             bytes.buffer,
             {
@@ -172,6 +195,8 @@ export async function importPrivateKey(pem) {
             false,
             ["decrypt"],
         );
+        validateRsaKey(privateKey);
+        return privateKey;
     } catch (error) {
         throw new ClavimitError(
             "INVALID_PRIVATE_KEY",
@@ -275,8 +300,8 @@ export async function generateKeyPair() {
     const { publicKey, privateKey } = await crypto.subtle.generateKey(
         {
             name: "RSA-OAEP",
-            modulusLength: 4096,
-            publicExponent: new Uint8Array([1, 0, 1]),
+            modulusLength: GENERATED_RSA_MODULUS_LENGTH,
+            publicExponent: RSA_PUBLIC_EXPONENT,
             hash: "SHA-256",
         },
         true,
