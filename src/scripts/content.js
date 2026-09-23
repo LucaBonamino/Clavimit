@@ -196,8 +196,6 @@ decryptButton.addEventListener("click", async () => {
         const plaintext = await decryptMessage(message, privateKey);
         decryptedText.value = plaintext;
         document.getElementById("decryptionResultArea").hidden = false;
-        privateKeyInput.value = "";
-        privateKeyFile.value = "";
         setStatus(decryptStatus, "✓ Message decrypted", true);
     } catch (error) {
         console.error("Decryption error:", error);
@@ -212,6 +210,8 @@ decryptButton.addEventListener("click", async () => {
     } finally {
         decryptButton.disabled = false;
         decryptButton.textContent = "Decrypt Email";
+        privateKeyInput.value = "";
+        privateKeyFile.value = "";
     }
 });
 
@@ -268,12 +268,6 @@ button.addEventListener("click", async () => {
         const enc = await encryptMessage(text, publicKey, senderPublicKey);
         const message = composeMessage(enc);
         await setEmailText(message);
-        publicKeyInput.value = "";
-        publicKeyFile.value = "";
-        if (senderPublicKeyInput.value) {
-            senderPublicKeyInput.value = "";
-            senderPublicKeyFile.value = "";
-        }
     } catch (error) {
         console.error("Encryption error:", error);
 
@@ -285,5 +279,11 @@ button.addEventListener("click", async () => {
     } finally {
         button.disabled = false;
         button.textContent = "Encrypt Email";
+        publicKeyInput.value = "";
+        publicKeyFile.value = "";
+        if (senderPublicKeyInput.value) {
+            senderPublicKeyInput.value = "";
+            senderPublicKeyFile.value = "";
+        }
     }
 });

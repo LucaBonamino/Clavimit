@@ -63,7 +63,7 @@ UI improvements, tests, documentation, validation, browser compatibility, and Gm
 
 If this is your first contribution, these are good places to start:
 
-* [#3 — Clear key inputs after failed decryption](https://github.com/LucaBonamino/Clavimit/issues/3)
+* [#7 — RSA key requirements are not validated](https://github.com/LucaBonamino/Clavimit/issues/14)
 * [#1 — Keep package and manifest versions synchronized](https://github.com/LucaBonamino/Clavimit/issues/1)
 * [See all good first issues](https://github.com/LucaBonamino/Clavimit/issues)
 
