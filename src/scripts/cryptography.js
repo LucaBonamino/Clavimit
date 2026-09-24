@@ -76,10 +76,7 @@ export async function encryptMessage(text, publicKeyPem, senderPublicKeyPem) {
         }
         senderEncKey = toBase64(await encryptAESKey(senderRsaKey, rawKey));
     }
-    // if (senderPublicKeyPem != null) {
-    //     const senderRsaKey = await importPublicKey(senderPublicKeyPem);
-    //     senderEncKey = toBase64(await encryptAESKey(senderRsaKey, rawKey));
-    // }
+    
     return {
         encryptedKeys: {
             recipient: toBase64(encKey),
