@@ -267,7 +267,18 @@ git checkout develop
 npm install
 ```
 
-#### Build for Chrome
+### Build requirements
+
+The extension build requires:
+* Node.js
+* npm
+* No external or web-based build tools
+
+package-lock.json is included to reproduce dependency versions.
+
+The build script copies the extension source files, selects the browser-specific implementation, and generates the final manifest.json by combining the common manifest with the browser-specific manifest.
+
+### Build for Chrome
 Run
 ```bash
 npm run build:chrome
@@ -283,7 +294,7 @@ To load it manually:
 6. Open Gmail.
 7. Open Clavimit from Chrome and use the side panel to encrypt or decrypt messages.
 
-#### Build for Firefox
+### Build for Firefox
 Run
 ```bash
 npm run build:firefox
@@ -295,7 +306,7 @@ To load it manually:
 2. Navigate to `about:debugging`. 
 3. Select **This Firefox**.
 4. Click **Load Temporary Add-on**.
-5.Select the `dist/firefox` directory.
+5.Select the `dist/firefox/manifest.json` file.
 6. Open Gmail.
 7. Open Clavimit from Chrome and use the side panel to encrypt or decrypt messages.
 
